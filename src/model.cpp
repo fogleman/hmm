@@ -49,6 +49,8 @@ void Model::Step() {
     const glm::ivec2 c = t->C();
     const glm::ivec2 p = t->Candidate();
 
+    std::cout << t->Error() << " " << p.x << "," << p.y << std::endl;
+
     const auto handleCollinear = [this](
         const glm::ivec2 &a, const glm::ivec2 &b, const glm::ivec2 &c,
         const glm::ivec2 &p)
@@ -91,6 +93,11 @@ void Model::Step() {
         Legalize(b, c);
         Legalize(c, a);
     }
+
+    if (!m_Queue.IsHeap()) {
+        std::cerr << "invalid heap!" << std::endl;
+        std::exit(1);
+    }
 }
 
 void Model::AddTriangle(
@@ -100,7 +107,7 @@ void Model::AddTriangle(
 {
     // TODO: possible unnecessary rasterization during legalize
     const auto pair = m_Heightmap->FindCandidate(a, b, c);
-    auto t = std::make_shared<Triangle>(a, b, c, pair.first, pair.second);
+    const auto t = std::make_shared<Triangle>(a, b, c, pair.first, pair.second);
     m_Halfedges[MakeEdge(a, b)] = t;
     m_Halfedges[MakeEdge(b, c)] = t;
     m_Halfedges[MakeEdge(c, a)] = t;

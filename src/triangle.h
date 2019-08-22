@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <glm/glm.hpp>
 
 class Triangle {
@@ -27,8 +28,11 @@ public:
             return m_B;
         } else if (p == m_B) {
             return m_C;
-        } else {
+        } else if (p == m_C) {
             return m_A;
+        } else {
+            std::cerr << "invalid PointAfter argument" << std::endl;
+            std::exit(1);
         }
     }
 
@@ -42,11 +46,6 @@ public:
 
     int QueueIndex() const {
         return m_QueueIndex;
-    }
-
-    void SetCandidate(const glm::ivec2 &candidate, const float error) {
-        m_Candidate = candidate;
-        m_Error = error;
     }
 
     void SetQueueIndex(const int index) {

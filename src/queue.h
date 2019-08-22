@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 
 #include "triangle.h"
@@ -35,9 +36,28 @@ public:
         return m_Queue.front();
     }
 
+    bool IsHeap() const {
+        const int n = m_Queue.size();
+        for (int i = 0; i < n; i++) {
+            const int j1 = 2 * i + 1;
+            const int j2 = 2 * i + 2;
+            if (j1 < n && !LessEqual(i, j1)) {
+                return false;
+            }
+            if (j2 < n && !LessEqual(i, j2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 private:
     bool Less(const int i, const int j) const {
         return -m_Queue[i]->Error() < -m_Queue[j]->Error();
+    }
+
+    bool LessEqual(const int i, const int j) const {
+        return -m_Queue[i]->Error() <= -m_Queue[j]->Error();
     }
 
     std::shared_ptr<Triangle> PopBack() {
@@ -48,11 +68,12 @@ private:
     }
 
     void Swap(const int i, const int j) {
-        auto temp = m_Queue[i];
-        m_Queue[i] = m_Queue[j];
-        m_Queue[j] = temp;
-        m_Queue[i]->SetQueueIndex(i);
-        m_Queue[j]->SetQueueIndex(j);
+        const auto pi = m_Queue[i];
+        const auto pj = m_Queue[j];
+        m_Queue[i] = pj;
+        m_Queue[j] = pi;
+        pj->SetQueueIndex(i);
+        pi->SetQueueIndex(j);
     }
 
     void Up(int j) {
@@ -69,11 +90,11 @@ private:
     bool Down(const int i0, const int n) {
         int i = i0;
         while (1) {
-            int j1 = 2 * i + 1;
-            if (j1 >= n) {
+            const int j1 = 2 * i + 1;
+            if (j1 >= n || j1 < 0) {
                 break;
             }
-            int j2 = j1 + 1;
+            const int j2 = j1 + 1;
             int j = j1;
             if (j2 < n && Less(j2, j1)) {
                 j = j2;

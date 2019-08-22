@@ -16,7 +16,6 @@ int main(int argc, char **argv) {
 
     Model model(hm);
     while (model.Error() > 0.001) {
-        std::cout << model.Error() << std::endl;
         model.Step();
     }
     
