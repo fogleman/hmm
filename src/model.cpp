@@ -69,7 +69,7 @@ void Model::Step() {
             Legalize(c, a);
             return;
         }
-        m_Queue.Remove(s->QueueIndex());
+        m_Queue.Remove(s);
         const glm::ivec2 d = s->PointAfter(a);
         AddTriangle(b, c, p);
         AddTriangle(c, a, p);
@@ -130,8 +130,8 @@ void Model::Legalize(const glm::ivec2 p0, const glm::ivec2 p1) {
         return;
     }
     // remove triangles from priority queue
-    m_Queue.Remove(t->QueueIndex());
-    m_Queue.Remove(s->QueueIndex());
+    m_Queue.Remove(t);
+    m_Queue.Remove(s);
     // remove edges that will no longer exist
     m_Halfedges.erase(e0);
     m_Halfedges.erase(e1);

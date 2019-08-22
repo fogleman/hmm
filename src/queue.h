@@ -25,7 +25,8 @@ public:
         return PopBack();
     }
 
-    std::shared_ptr<Triangle> Remove(const int i) {
+    std::shared_ptr<Triangle> Remove(const std::shared_ptr<Triangle> &t) {
+        const int i = t->QueueIndex();
         const int n = m_Queue.size() - 1;
         if (n != i) {
             Swap(i, n);
