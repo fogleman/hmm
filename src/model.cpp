@@ -1,26 +1,26 @@
 #include "model.h"
 
-glm::ivec4 MakeEdge(const glm::ivec2 &a, const glm::ivec2 &b) {
+glm::ivec4 MakeEdge(const glm::ivec2 a, const glm::ivec2 b) {
     return glm::ivec4(a.x, a.y, b.x, b.y);
 }
 
-bool Collinear(const glm::ivec2 &p0, const glm::ivec2 &p1, const glm::ivec2 &p2) {
+bool Collinear(const glm::ivec2 p0, const glm::ivec2 p1, const glm::ivec2 p2) {
     return (p1.y-p0.y)*(p2.x-p1.x) == (p2.y-p1.y)*(p1.x-p0.x);
 }
 
 bool InCircle(
-    const glm::ivec2 &a, const glm::ivec2 &b, const glm::ivec2 &c,
-    const glm::ivec2 &p)
+    const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c,
+    const glm::ivec2 p)
 {
-    const int dx = a.x - p.x;
-    const int dy = a.y - p.y;
-    const int ex = b.x - p.x;
-    const int ey = b.y - p.y;
-    const int fx = c.x - p.x;
-    const int fy = c.y - p.y;
-    const int ap = dx * dx + dy * dy;
-    const int bp = ex * ex + ey * ey;
-    const int cp = fx * fx + fy * fy;
+    const int64_t dx = a.x - p.x;
+    const int64_t dy = a.y - p.y;
+    const int64_t ex = b.x - p.x;
+    const int64_t ey = b.y - p.y;
+    const int64_t fx = c.x - p.x;
+    const int64_t fy = c.y - p.y;
+    const int64_t ap = dx * dx + dy * dy;
+    const int64_t bp = ex * ex + ey * ey;
+    const int64_t cp = fx * fx + fy * fy;
     return dx*(ey*cp-bp*fy)-dy*(ex*cp-bp*fx)+ap*(ex*fy-ey*fx) < 0;
 }
 
@@ -38,6 +38,10 @@ Model::Model(const std::shared_ptr<Heightmap> &heightmap) :
     AddTriangle(p00, p11, p10);
 }
 
+const std::vector<std::shared_ptr<Triangle>> &Model::Triangles() const {
+    return m_Queue.Items();
+}
+
 float Model::Error() const {
     return m_Queue.Head()->Error();
 }
@@ -49,11 +53,9 @@ void Model::Step() {
     const glm::ivec2 c = t->C();
     const glm::ivec2 p = t->Candidate();
 
-    std::cout << t->Error() << " " << p.x << "," << p.y << std::endl;
-
     const auto handleCollinear = [this](
-        const glm::ivec2 &a, const glm::ivec2 &b, const glm::ivec2 &c,
-        const glm::ivec2 &p)
+        const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c,
+        const glm::ivec2 p)
     {
         const glm::ivec4 e0 = MakeEdge(a, b);
         const glm::ivec4 e1 = MakeEdge(b, a);
@@ -68,7 +70,7 @@ void Model::Step() {
             return;
         }
         m_Queue.Remove(s->QueueIndex());
-        const glm::ivec2 &d = s->PointAfter(a);
+        const glm::ivec2 d = s->PointAfter(a);
         AddTriangle(b, c, p);
         AddTriangle(c, a, p);
         AddTriangle(a, d, p);
@@ -93,17 +95,12 @@ void Model::Step() {
         Legalize(b, c);
         Legalize(c, a);
     }
-
-    if (!m_Queue.IsHeap()) {
-        std::cerr << "invalid heap!" << std::endl;
-        std::exit(1);
-    }
 }
 
 void Model::AddTriangle(
-    const glm::ivec2 &a, 
-    const glm::ivec2 &b, 
-    const glm::ivec2 &c)
+    const glm::ivec2 a, 
+    const glm::ivec2 b, 
+    const glm::ivec2 c)
 {
     // TODO: possible unnecessary rasterization during legalize
     const auto pair = m_Heightmap->FindCandidate(a, b, c);
@@ -114,7 +111,7 @@ void Model::AddTriangle(
     m_Queue.Push(t);
 }
 
-void Model::Legalize(const glm::ivec2 &p0, const glm::ivec2 &p1) {
+void Model::Legalize(const glm::ivec2 p0, const glm::ivec2 p1) {
     const glm::ivec4 e0 = MakeEdge(p0, p1);
     const glm::ivec4 e1 = MakeEdge(p1, p0);
     // lookup triangle from edge
@@ -126,8 +123,8 @@ void Model::Legalize(const glm::ivec2 &p0, const glm::ivec2 &p1) {
         return;
     }
     // get other triangle points
-    const glm::ivec2 &p2 = t->PointAfter(p1);
-    const glm::ivec2 &p3 = s->PointAfter(p0);
+    const glm::ivec2 p2 = t->PointAfter(p1);
+    const glm::ivec2 p3 = s->PointAfter(p0);
     // check delaunay condition
     if (!InCircle(p0, p1, p2, p3)) {
         return;

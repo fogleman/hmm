@@ -18,6 +18,8 @@ int main(int argc, char **argv) {
     while (model.Error() > 0.001) {
         model.Step();
     }
+
+    std::cout << model.Triangles().size() << std::endl;
     
     // const glm::ivec2 p00(0, 0);
     // const glm::ivec2 p01(0, h - 1);

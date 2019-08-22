@@ -1,42 +1,38 @@
 #pragma once
 
-#include <iostream>
 #include <glm/glm.hpp>
 
 class Triangle {
 public:
     Triangle(
-        const glm::ivec2 &a, const glm::ivec2 &b, const glm::ivec2 &c,
-        const glm::ivec2 &candidate, const float error) :
+        const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c,
+        const glm::ivec2 candidate, const float error) :
         m_A(a), m_B(b), m_C(c),
         m_Candidate(candidate), m_Error(error), m_QueueIndex(-1) {}
 
-    const glm::ivec2 &A() const {
+    const glm::ivec2 A() const {
         return m_A;
     }
 
-    const glm::ivec2 &B() const {
+    const glm::ivec2 B() const {
         return m_B;
     }
 
-    const glm::ivec2 &C() const {
+    const glm::ivec2 C() const {
         return m_C;
     }
 
-    const glm::ivec2 &PointAfter(const glm::ivec2 &p) const {
+    const glm::ivec2 PointAfter(const glm::ivec2 p) const {
         if (p == m_A) {
             return m_B;
         } else if (p == m_B) {
             return m_C;
-        } else if (p == m_C) {
-            return m_A;
         } else {
-            std::cerr << "invalid PointAfter argument" << std::endl;
-            std::exit(1);
+            return m_A;
         }
     }
 
-    const glm::ivec2 &Candidate() const {
+    const glm::ivec2 Candidate() const {
         return m_Candidate;
     }
 

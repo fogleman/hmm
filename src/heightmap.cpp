@@ -23,12 +23,12 @@ Heightmap::Heightmap(const std::string &path) :
 }
 
 std::pair<glm::ivec2, float> Heightmap::FindCandidate(
-    const glm::ivec2 &p0,
-    const glm::ivec2 &p1,
-    const glm::ivec2 &p2) const
+    const glm::ivec2 p0,
+    const glm::ivec2 p1,
+    const glm::ivec2 p2) const
 {
     const auto edge = [](
-        const glm::ivec2 &a, const glm::ivec2 &b, const glm::ivec2 &c)
+        const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c)
     {
         return (b.x - c.x) * (a.y - c.y) - (b.y - c.y) * (a.x - c.x);
     };
