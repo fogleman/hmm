@@ -40,21 +40,6 @@ public:
         return m_Queue.front();
     }
 
-    // bool IsHeap() const {
-    //     const int n = m_Queue.size();
-    //     for (int i = 0; i < n; i++) {
-    //         const int j1 = 2 * i + 1;
-    //         const int j2 = 2 * i + 2;
-    //         if (j1 < n && !LessEqual(i, j1)) {
-    //             return false;
-    //         }
-    //         if (j2 < n && !LessEqual(i, j2)) {
-    //             return false;
-    //         }
-    //     }
-    //     return true;
-    // }
-
 private:
     bool Less(const int i, const int j) const {
         return -m_Queue[i]->Error() < -m_Queue[j]->Error();
