@@ -12,26 +12,28 @@ Heightmap::Heightmap(const std::string &path) :
     if (data) {
         m_Width = w;
         m_Height = h;
-        m_Data.assign(data, data + w * h);
+        const int n = w * h;
+        const float m = 1.f / 65535.f;
+        m_Data.resize(n);
+        for (int i = 0; i < n; i++) {
+            m_Data[i] = data[i] * m;
+        }
         free(data);
     }
 }
 
-Candidate Heightmap::FindCandidate(
-    const glm::ivec2 &p0, const glm::ivec2 &p1, const glm::ivec2 &p2) const
+std::pair<glm::ivec2, float> Heightmap::FindCandidate(
+    const glm::ivec2 &p0,
+    const glm::ivec2 &p1,
+    const glm::ivec2 &p2) const
 {
-    Candidate candidate;
-
-    const auto edge = [](const glm::ivec2 &a, const glm::ivec2 &b, const glm::ivec2 &c) {
+    const auto edge = [](
+        const glm::ivec2 &a, const glm::ivec2 &b, const glm::ivec2 &c)
+    {
         return (b.x - c.x) * (a.y - c.y) - (b.y - c.y) * (a.x - c.x);
     };
 
-    // z values at vertices
-    const uint16_t z0 = At(p0);
-    const uint16_t z1 = At(p1);
-    const uint16_t z2 = At(p2);
-
-    // bounding box
+    // triangle bounding box
     const glm::ivec2 min = glm::min(glm::min(p0, p1), p2);
     const glm::ivec2 max = glm::max(glm::max(p0, p1), p2);
 
@@ -46,60 +48,59 @@ Candidate Heightmap::FindCandidate(
     const int a20 = p0.y - p2.y;
     const int b20 = p2.x - p0.x;
 
-    // reciprocals
-    const float ra = 1.f / edge(p0, p1, p2);
-    // const float ra12 = 1.f / a12;
-    // const float ra20 = 1.f / a20;
-    // const float ra01 = 1.f / a01;
+    // pre-multiplied z values at vertices
+    const float a = edge(p0, p1, p2);
+    const float z0 = At(p0) / a;
+    const float z1 = At(p1) / a;
+    const float z2 = At(p2) / a;
 
     // iterate over pixels in bounding box
+    float maxError = 0;
+    glm::ivec2 maxPoint(0);
     for (int y = min.y; y <= max.y; y++) {
-        int d = 0;
-        const int d0 = -w00 / a12;
-        const int d1 = -w01 / a20;
-        const int d2 = -w02 / a01;
-        if (w00 < 0 && d0 > d) {
-            d = d0;
+        // compute starting offset
+        int dx = 0;
+        if (w00 < 0 && a12 != 0) {
+            dx = std::max(dx, -w00 / a12);
         }
-        if (w01 < 0 && d1 > d) {
-            d = d1;
+        if (w01 < 0 && a20 != 0) {
+            dx = std::max(dx, -w01 / a20);
         }
-        if (w02 < 0 && d2 > d) {
-            d = d2;
+        if (w02 < 0 && a01 != 0) {
+            dx = std::max(dx, -w02 / a01);
         }
 
-        int w0 = w00 + a12 * d;
-        int w1 = w01 + a20 * d;
-        int w2 = w02 + a01 * d;
+        int w0 = w00 + a12 * dx;
+        int w1 = w01 + a20 * dx;
+        int w2 = w02 + a01 * dx;
+
         bool wasInside = false;
-        for (int x = min.x + d; x <= max.x; x++) {
-            const float b0 = w0 * ra;
-            const float b1 = w1 * ra;
-            const float b2 = w2 * ra;
+
+        for (int x = min.x + dx; x <= max.x; x++) {
+            // check if inside triangle
+            if (w0 >= 0 && w1 >= 0 && w2 >= 0) {
+                wasInside = true;
+
+                // compute z using barycentric coordinates
+                const float z = z0 * w0 + z1 * w1 + z2 * w2;
+                const float dz = std::abs(z - At(x, y));
+                if (dz > maxError) {
+                    maxError = dz;
+                    maxPoint = glm::ivec2(x, y);
+                }
+            } else if (wasInside) {
+                break;
+            }
+
             w0 += a12;
             w1 += a20;
             w2 += a01;
-
-            // check if inside triangle
-            if (b0 < 0 || b1 < 0 || b2 < 0) {
-                if (wasInside) {
-                    break;
-                }
-                continue;
-            }
-            wasInside = true;
-
-            // compute z using barycentric coordinates
-            const float z = z0 * b0 + z1 * b1 + z2 * b2;
-            const float dz = std::abs(z - At(x, y));
-            if (dz > candidate.Error()) {
-                candidate = Candidate(glm::ivec2(x, y), dz);
-            }
         }
+
         w00 += b12;
         w01 += b20;
         w02 += b01;
     }
 
-    return candidate;
+    return std::make_pair(maxPoint, maxError);
 }

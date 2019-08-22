@@ -1,8 +1,8 @@
+#pragma once
+
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
-
-#include "candidate.h"
 
 class Heightmap {
 public:
@@ -16,15 +16,15 @@ public:
         return m_Height;
     }
 
-    uint16_t At(const int x, const int y) const {
+    float At(const int x, const int y) const {
         return m_Data[y * m_Width + x];
     }
 
-    uint16_t At(const glm::ivec2 &p) const {
+    float At(const glm::ivec2 &p) const {
         return m_Data[p.y * m_Width + p.x];
     }
 
-    Candidate FindCandidate(
+    std::pair<glm::ivec2, float> FindCandidate(
         const glm::ivec2 &p0,
         const glm::ivec2 &p1,
         const glm::ivec2 &p2) const;
@@ -32,5 +32,5 @@ public:
 private:
     int m_Width;
     int m_Height;
-    std::vector<uint16_t> m_Data;
+    std::vector<float> m_Data;
 };
