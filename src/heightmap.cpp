@@ -7,19 +7,20 @@ Heightmap::Heightmap(const std::string &path) :
     m_Width(0),
     m_Height(0)
 {
-    int w, h, n;
-    uint16_t *data = stbi_load_16(path.c_str(), &w, &h, &n, 1);
-    if (data) {
-        m_Width = w;
-        m_Height = h;
-        const int n = w * h;
-        const float m = 1.f / 65535.f;
-        m_Data.resize(n);
-        for (int i = 0; i < n; i++) {
-            m_Data[i] = data[i] * m;
-        }
-        free(data);
+    int w, h, c;
+    uint16_t *data = stbi_load_16(path.c_str(), &w, &h, &c, 1);
+    if (!data) {
+        return;
     }
+    m_Width = w;
+    m_Height = h;
+    const int n = w * h;
+    const float m = 1.f / 65535.f;
+    m_Data.resize(n);
+    for (int i = 0; i < n; i++) {
+        m_Data[i] = data[i] * m;
+    }
+    free(data);
 }
 
 std::pair<glm::ivec2, float> Heightmap::FindCandidate(

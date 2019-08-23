@@ -39,7 +39,7 @@ Model::Model(const std::shared_ptr<Heightmap> &heightmap) :
 }
 
 const std::vector<std::shared_ptr<Triangle>> &Model::Triangles() const {
-    return m_Queue.Items();
+    return m_Queue.Triangles();
 }
 
 float Model::Error() const {

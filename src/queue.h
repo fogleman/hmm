@@ -7,7 +7,7 @@
 
 class Queue {
 public:
-    const std::vector<std::shared_ptr<Triangle>> &Items() const {
+    const std::vector<std::shared_ptr<Triangle>> &Triangles() const {
         return m_Queue;
     }
 
