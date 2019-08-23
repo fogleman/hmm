@@ -3,10 +3,10 @@
 
 #include "heightmap.h"
 #include "model.h"
+#include "triangulator.h"
 
 int main(int argc, char **argv) {
     const auto hm = std::make_shared<Heightmap>(argv[1]);
-    // Heightmap hm(argv[1]);
 
     const int w = hm->Width();
     const int h = hm->Height();
@@ -14,12 +14,20 @@ int main(int argc, char **argv) {
     std::cout << w << "x" << h << std::endl;
     std::cout << hm->At(0, 0) << std::endl;
 
-    Model model(hm);
-    while (model.Error() > 0.001) {
-        model.Step();
+    Triangulator tri(hm);
+    tri.Dump();
+
+    for (int i = 0; i < 1; i++) {
+        tri.Step();
+        tri.Dump();
     }
 
-    std::cout << model.Triangles().size() << std::endl;
+    // Model model(hm);
+    // while (model.Error() > 0.001) {
+    //     model.Step();
+    // }
+
+    // std::cout << model.Triangles().size() << std::endl;
     
     // const glm::ivec2 p00(0, 0);
     // const glm::ivec2 p01(0, h - 1);

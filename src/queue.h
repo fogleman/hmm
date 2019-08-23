@@ -46,10 +46,6 @@ private:
         return -m_Queue[i]->Error() < -m_Queue[j]->Error();
     }
 
-    bool LessEqual(const int i, const int j) const {
-        return -m_Queue[i]->Error() <= -m_Queue[j]->Error();
-    }
-
     std::shared_ptr<Triangle> PopBack() {
         auto t = m_Queue.back();
         m_Queue.pop_back();
