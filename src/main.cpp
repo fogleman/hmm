@@ -15,11 +15,16 @@ int main(int argc, char **argv) {
     std::cout << hm->At(0, 0) << std::endl;
 
     Triangulator tri(hm);
-    tri.Dump();
+    // tri.Dump();
 
-    for (int i = 0; i < 1; i++) {
+    // for (int i = 0; i < 1; i++) {
+    //     tri.Step();
+    //     tri.Dump();
+    // }
+
+    while (tri.Error() > 0.001) {
+        // printf("%f\n", tri.Error());
         tri.Step();
-        tri.Dump();
     }
 
     // Model model(hm);

@@ -25,7 +25,7 @@ float Triangulator::Error() const {
 void Triangulator::Step() {
     const int t = QueuePop();
 
-    printf("%d %g\n", t, m_Errors[t]);
+    // printf("%d %g\n", t, m_Errors[t]);
 
     const int e0 = t * 3 + 0;
     const int e1 = t * 3 + 1;
@@ -48,16 +48,70 @@ void Triangulator::Step() {
 
     UnlinkTriangle(t);
 
+    // const auto handleCollinear = [this](
+    //     const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c,
+    //     const glm::ivec2 p)
+    // {
+    //     const glm::ivec4 e0 = MakeEdge(a, b);
+    //     const glm::ivec4 e1 = MakeEdge(b, a);
+    //     const auto s = m_Halfedges[e1];
+    //     m_Halfedges.erase(e0);
+    //     m_Halfedges.erase(e1);
+    //     if (!s) {
+    //         AddTriangle(b, c, p);
+    //         AddTriangle(c, a, p);
+    //         Legalize(b, c);
+    //         Legalize(c, a);
+    //         return;
+    //     }
+    //     m_Queue.Remove(s);
+    //     const glm::ivec2 d = s->PointAfter(a);
+    //     AddTriangle(b, c, p);
+    //     AddTriangle(c, a, p);
+    //     AddTriangle(a, d, p);
+    //     AddTriangle(d, b, p);
+    //     Legalize(b, c);
+    //     Legalize(c, a);
+    //     Legalize(a, d);
+    //     Legalize(d, b);
+    // };
+
+    const auto handleCollinear = [this](const int pn, const int a) {
+        const int b = m_Halfedges[a];
+        if (b < 0) {
+            const int a0 = a - a % 3;
+            const int al = a0 + (a + 1) % 3;
+            const int ar = a0 + (a + 2) % 3;
+            const int p0 = m_Triangles[ar];
+            const int pr = m_Triangles[a];
+            const int pl = m_Triangles[al];
+            const int hal = m_Halfedges[al];
+            const int har = m_Halfedges[ar];
+            const int t0 = AddTriangle(pn, p0, pr, -1, har, -1);
+            const int t1 = AddTriangle(p0, pn, pl, t0 * 3, -1, hal);
+            Legalize(t0 * 3 + 1);
+            Legalize(t1 * 3 + 2);
+            return;
+        }
+        QueueRemove(b / 3);
+    };
+
     if (Collinear(a, b, p)) {
+        handleCollinear(pn, e0);
         // handleCollinear(a, b, c, p);
     } else if (Collinear(b, c, p)) {
+        handleCollinear(pn, e1);
         // handleCollinear(b, c, a, p);
     } else if (Collinear(c, a, p)) {
+        handleCollinear(pn, e2);
         // handleCollinear(c, a, b, p);
     } else {
         const int t0 = AddTriangle(p0, p1, pn, h0, -1, -1);
         const int t1 = AddTriangle(p1, p2, pn, h1, -1, t0 * 3 + 1);
         const int t2 = AddTriangle(p2, p0, pn, h2, t0 * 3 + 2, t1 * 3 + 1);
+        Legalize(t0 * 3);
+        Legalize(t1 * 3);
+        Legalize(t2 * 3);
         // AddTriangle(a, b, p);
         // AddTriangle(b, c, p);
         // AddTriangle(c, a, p);
@@ -135,20 +189,11 @@ void Triangulator::Legalize(const int a) {
     //          \||/                  \  /
     //           pr                    pr
 
-    // // remove triangles from priority queue
-    // m_Queue.Remove(t);
-    // m_Queue.Remove(s);
-    // // remove edges that will no longer exist
-    // m_Halfedges.erase(e0);
-    // m_Halfedges.erase(e1);
-    // // add new triangles
-    // AddTriangle(p1, p2, p3);
-    // AddTriangle(p0, p3, p2);
-    // // recursively check next edges
-    // Legalize(p3, p1);
-    // Legalize(p0, p3);
-
     const int b = m_Halfedges[a];
+
+    if (b < 0) {
+        return;
+    }
 
     const int a0 = a - a % 3;
     const int b0 = b - b % 3;
@@ -157,10 +202,6 @@ void Triangulator::Legalize(const int a) {
     const int ar = a0 + (a + 2) % 3;
     const int bl = b0 + (b + 2) % 3;
     const int br = b0 + (b + 1) % 3;
-
-    if (b < 0) {
-        return;
-    }
 
     const int p0 = m_Triangles[ar];
     const int pr = m_Triangles[a];
@@ -171,15 +212,24 @@ void Triangulator::Legalize(const int a) {
         return;
     }
 
-    m_Triangles[a] = p1;
-    m_Triangles[b] = p0;
+    const int hal = m_Halfedges[al];
+    const int har = m_Halfedges[ar];
+    const int hbl = m_Halfedges[bl];
+    const int hbr = m_Halfedges[br];
 
-    Link(a, m_Halfedges[bl]);
-    Link(b, m_Halfedges[ar]);
-    Link(ar, bl);
+    const int at = a / 3;
+    const int bt = b / 3;
 
-    Legalize(a);
-    Legalize(br);
+    QueueRemove(at);
+    QueueRemove(bt);
+    UnlinkTriangle(at);
+    UnlinkTriangle(bt);
+
+    const int t0 = AddTriangle(p0, p1, pl, -1, hbl, hal);
+    const int t1 = AddTriangle(p1, p0, pr, t0 * 3, har, hbr);
+
+    Legalize(t0 * 3 + 1);
+    Legalize(t1 * 3 + 2);
 }
 
 // priority queue functions
