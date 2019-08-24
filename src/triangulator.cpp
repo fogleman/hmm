@@ -310,6 +310,7 @@ bool Triangulator::QueueDown(const int i0, const int n) {
 // debug output
 
 void Triangulator::Dump() const {
+    printf("%ld\n", m_Candidates.size());
     printf("%ld\n", m_Queue.size());
     return;
 

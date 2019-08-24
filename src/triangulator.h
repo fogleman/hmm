@@ -19,7 +19,7 @@ public:
         std::vector<glm::vec3> points;
         points.reserve(m_Points.size());
         for (const glm::ivec2 &p : m_Points) {
-            points.emplace_back(p.x, p.y, m_Heightmap->At(p.x, p.y) * 100);
+            points.emplace_back(p.x, p.y, m_Heightmap->At(p.x, p.y) * 200);
         }
         return points;
     }
@@ -71,11 +71,3 @@ private:
 
     std::vector<int> m_Queue;
 };
-
-// points[p]
-// triangles[e] = p
-// halfedges[e] = e
-// candidates[t]
-// errors[t]
-// queueIndexes[t] = q
-// queue[q] = t
