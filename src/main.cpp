@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
         // printf("%f\n", tri.Error());
         tri.Step();
     }
+    tri.Dump();
 
     // Model model(hm);
     // while (model.Error() > 0.001) {

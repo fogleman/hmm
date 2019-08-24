@@ -46,8 +46,6 @@ void Triangulator::Step() {
 
     const int pn = AddPoint(p);
 
-    UnlinkTriangle(t);
-
     // const auto handleCollinear = [this](
     //     const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c,
     //     const glm::ivec2 p)
@@ -78,6 +76,7 @@ void Triangulator::Step() {
 
     const auto handleCollinear = [this](const int pn, const int a) {
         const int b = m_Halfedges[a];
+
         if (b < 0) {
             const int a0 = a - a % 3;
             const int al = a0 + (a + 1) % 3;
@@ -93,19 +92,53 @@ void Triangulator::Step() {
             Legalize(t1 * 3 + 2);
             return;
         }
-        QueueRemove(b / 3);
+
+        const int a0 = a - a % 3;
+        const int b0 = b - b % 3;
+
+        const int al = a0 + (a + 1) % 3;
+        const int ar = a0 + (a + 2) % 3;
+        const int bl = b0 + (b + 2) % 3;
+        const int br = b0 + (b + 1) % 3;
+
+        const int p0 = m_Triangles[ar];
+        const int pr = m_Triangles[a];
+        const int pl = m_Triangles[al];
+        const int p1 = m_Triangles[bl];
+
+        const int hal = m_Halfedges[al];
+        const int har = m_Halfedges[ar];
+        const int hbl = m_Halfedges[bl];
+        const int hbr = m_Halfedges[br];
+
+        const int bt = b / 3;
+        QueueRemove(bt);
+        UnlinkTriangle(bt);
+
+        const int t0 = AddTriangle(p0, pr, pn, har, -1, -1);
+        const int t1 = AddTriangle(pr, p1, pn, hbr, -1, t0 * 3 + 1);
+        const int t2 = AddTriangle(p1, pl, pn, hbl, -1, t1 * 3 + 1);
+        const int t3 = AddTriangle(pl, p0, pn, hal, t0 * 3 + 2, t2 * 3 + 1);
+        Legalize(t0 * 3);
+        Legalize(t1 * 3);
+        Legalize(t2 * 3);
+        Legalize(t3 * 3);
     };
 
     if (Collinear(a, b, p)) {
         handleCollinear(pn, e0);
         // handleCollinear(a, b, c, p);
+        UnlinkTriangle(t);
     } else if (Collinear(b, c, p)) {
         handleCollinear(pn, e1);
         // handleCollinear(b, c, a, p);
+        UnlinkTriangle(t);
     } else if (Collinear(c, a, p)) {
         handleCollinear(pn, e2);
         // handleCollinear(c, a, b, p);
+        UnlinkTriangle(t);
     } else {
+        UnlinkTriangle(t);
         const int t0 = AddTriangle(p0, p1, pn, h0, -1, -1);
         const int t1 = AddTriangle(p1, p2, pn, h1, -1, t0 * 3 + 1);
         const int t2 = AddTriangle(p2, p0, pn, h2, t0 * 3 + 2, t1 * 3 + 1);
@@ -219,7 +252,6 @@ void Triangulator::Legalize(const int a) {
 
     const int at = a / 3;
     const int bt = b / 3;
-
     QueueRemove(at);
     QueueRemove(bt);
     UnlinkTriangle(at);
@@ -315,6 +347,9 @@ bool Triangulator::QueueDown(const int i0, const int n) {
 // debug output
 
 void Triangulator::Dump() const {
+    printf("%ld\n", m_Queue.size());
+    return;
+
     printf("\n");
     printf("m_Points:\n");
     for (int i = 0; i < m_Points.size(); i++) {
