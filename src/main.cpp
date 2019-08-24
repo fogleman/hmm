@@ -3,6 +3,7 @@
 
 #include "heightmap.h"
 #include "model.h"
+#include "stl.h"
 #include "triangulator.h"
 
 int main(int argc, char **argv) {
@@ -27,6 +28,8 @@ int main(int argc, char **argv) {
         tri.Step();
     }
     tri.Dump();
+
+    SaveBinarySTL("out.stl", tri.Points(), tri.Triangles());
 
     // Model model(hm);
     // while (model.Error() > 0.001) {

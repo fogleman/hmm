@@ -5,7 +5,7 @@
 Triangulator::Triangulator(const std::shared_ptr<Heightmap> &heightmap) :
     m_Heightmap(heightmap)
 {
-    // add initial two triangles
+    // add points at all four corners
     const int x0 = 0;
     const int y0 = 0;
     const int x1 = m_Heightmap->Width() - 1;
@@ -14,6 +14,8 @@ Triangulator::Triangulator(const std::shared_ptr<Heightmap> &heightmap) :
     const int p1 = AddPoint(glm::ivec2(x1, y0));
     const int p2 = AddPoint(glm::ivec2(x0, y1));
     const int p3 = AddPoint(glm::ivec2(x1, y1));
+
+    // add initial two triangles
     const int t0 = AddTriangle(p3, p0, p2, -1, -1, -1);
     AddTriangle(p0, p3, p1, t0 * 3, -1, -1);
 }
@@ -23,9 +25,8 @@ float Triangulator::Error() const {
 }
 
 void Triangulator::Step() {
+    // pop triangle with highest error from priority queue
     const int t = QueuePop();
-
-    // printf("%d %g\n", t, m_Errors[t]);
 
     const int e0 = t * 3 + 0;
     const int e1 = t * 3 + 1;
@@ -45,34 +46,6 @@ void Triangulator::Step() {
     const glm::ivec2 p = m_Candidates[t];
 
     const int pn = AddPoint(p);
-
-    // const auto handleCollinear = [this](
-    //     const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c,
-    //     const glm::ivec2 p)
-    // {
-    //     const glm::ivec4 e0 = MakeEdge(a, b);
-    //     const glm::ivec4 e1 = MakeEdge(b, a);
-    //     const auto s = m_Halfedges[e1];
-    //     m_Halfedges.erase(e0);
-    //     m_Halfedges.erase(e1);
-    //     if (!s) {
-    //         AddTriangle(b, c, p);
-    //         AddTriangle(c, a, p);
-    //         Legalize(b, c);
-    //         Legalize(c, a);
-    //         return;
-    //     }
-    //     m_Queue.Remove(s);
-    //     const glm::ivec2 d = s->PointAfter(a);
-    //     AddTriangle(b, c, p);
-    //     AddTriangle(c, a, p);
-    //     AddTriangle(a, d, p);
-    //     AddTriangle(d, b, p);
-    //     Legalize(b, c);
-    //     Legalize(c, a);
-    //     Legalize(a, d);
-    //     Legalize(d, b);
-    // };
 
     const auto handleCollinear = [this](const int pn, const int a) {
         const int b = m_Halfedges[a];
@@ -113,7 +86,6 @@ void Triangulator::Step() {
 
         const int bt = b / 3;
         QueueRemove(bt);
-        UnlinkTriangle(bt);
 
         const int t0 = AddTriangle(p0, pr, pn, har, -1, -1);
         const int t1 = AddTriangle(pr, p1, pn, hbr, -1, t0 * 3 + 1);
@@ -123,35 +95,26 @@ void Triangulator::Step() {
         Legalize(t1 * 3);
         Legalize(t2 * 3);
         Legalize(t3 * 3);
+
+        UnlinkTriangle(bt);
     };
 
     if (Collinear(a, b, p)) {
         handleCollinear(pn, e0);
-        // handleCollinear(a, b, c, p);
-        UnlinkTriangle(t);
     } else if (Collinear(b, c, p)) {
         handleCollinear(pn, e1);
-        // handleCollinear(b, c, a, p);
-        UnlinkTriangle(t);
     } else if (Collinear(c, a, p)) {
         handleCollinear(pn, e2);
-        // handleCollinear(c, a, b, p);
-        UnlinkTriangle(t);
     } else {
-        UnlinkTriangle(t);
         const int t0 = AddTriangle(p0, p1, pn, h0, -1, -1);
         const int t1 = AddTriangle(p1, p2, pn, h1, -1, t0 * 3 + 1);
         const int t2 = AddTriangle(p2, p0, pn, h2, t0 * 3 + 2, t1 * 3 + 1);
         Legalize(t0 * 3);
         Legalize(t1 * 3);
         Legalize(t2 * 3);
-        // AddTriangle(a, b, p);
-        // AddTriangle(b, c, p);
-        // AddTriangle(c, a, p);
-        // Legalize(a, b);
-        // Legalize(b, c);
-        // Legalize(c, a);
     }
+
+    UnlinkTriangle(t);
 }
 
 int Triangulator::AddPoint(const glm::ivec2 point) {
