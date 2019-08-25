@@ -22,6 +22,27 @@ float Triangulator::Error() const {
     return m_Errors[m_Queue[0]];
 }
 
+std::vector<glm::vec3> Triangulator::Points(const float zScale) const {
+    std::vector<glm::vec3> points;
+    points.reserve(m_Points.size());
+    for (const glm::ivec2 &p : m_Points) {
+        points.emplace_back(p.x, -p.y, m_Heightmap->At(p.x, p.y) * zScale);
+    }
+    return points;
+}
+
+std::vector<glm::ivec3> Triangulator::Triangles() const {
+    std::vector<glm::ivec3> triangles;
+    triangles.reserve(m_Queue.size());
+    for (const int i : m_Queue) {
+        triangles.emplace_back(
+            m_Triangles[i * 3 + 0],
+            m_Triangles[i * 3 + 1],
+            m_Triangles[i * 3 + 2]);
+    }
+    return triangles;
+}
+
 void Triangulator::Step() {
     // pop triangle with highest error from priority queue
     const int t = QueuePop();
@@ -193,12 +214,10 @@ void Triangulator::Legalize(const int a) {
 
     const int a0 = a - a % 3;
     const int b0 = b - b % 3;
-
     const int al = a0 + (a + 1) % 3;
     const int ar = a0 + (a + 2) % 3;
     const int bl = b0 + (b + 2) % 3;
     const int br = b0 + (b + 1) % 3;
-
     const int p0 = m_Triangles[ar];
     const int pr = m_Triangles[a];
     const int pl = m_Triangles[al];
@@ -302,55 +321,4 @@ bool Triangulator::QueueDown(const int i0, const int n) {
         i = j;
     }
     return i > i0;
-}
-
-// debug output
-
-void Triangulator::Dump() const {
-    printf("%ld\n", m_Candidates.size());
-    printf("%ld\n", m_Queue.size());
-    return;
-
-    printf("\n");
-    printf("m_Points:\n");
-    for (int i = 0; i < m_Points.size(); i++) {
-        printf("%d: %d, %d\n", i, m_Points[i].x, m_Points[i].y);
-    }
-    printf("\n");
-
-    printf("m_Triangles:\n");
-    for (int i = 0; i < m_Triangles.size(); i++) {
-        printf("%d: %d\n", i, m_Triangles[i]);
-    }
-    printf("\n");
-
-    printf("m_Halfedges:\n");
-    for (int i = 0; i < m_Halfedges.size(); i++) {
-        printf("%d: %d\n", i, m_Halfedges[i]);
-    }
-    printf("\n");
-
-    printf("m_Candidates:\n");
-    for (int i = 0; i < m_Candidates.size(); i++) {
-        printf("%d: %d, %d\n", i, m_Candidates[i].x, m_Candidates[i].y);
-    }
-    printf("\n");
-
-    printf("m_Errors:\n");
-    for (int i = 0; i < m_Errors.size(); i++) {
-        printf("%d: %g\n", i, m_Errors[i]);
-    }
-    printf("\n");
-
-    printf("m_QueueIndexes:\n");
-    for (int i = 0; i < m_QueueIndexes.size(); i++) {
-        printf("%d: %d\n", i, m_QueueIndexes[i]);
-    }
-    printf("\n");
-
-    printf("m_Queue:\n");
-    for (int i = 0; i < m_Queue.size(); i++) {
-        printf("%d: %d\n", i, m_Queue[i]);
-    }
-    printf("\n");
 }

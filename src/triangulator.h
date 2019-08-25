@@ -10,32 +10,21 @@ class Triangulator {
 public:
     Triangulator(const std::shared_ptr<Heightmap> &heightmap);
 
+    int NumPoints() const {
+        return m_Points.size();
+    }
+
+    int NumTriangles() const {
+        return m_Queue.size();
+    }
+
     float Error() const;
 
+    std::vector<glm::vec3> Points(const float zScale) const;
+
+    std::vector<glm::ivec3> Triangles() const;
+
     void Step();
-
-    void Dump() const;
-
-    const std::vector<glm::vec3> Points() const {
-        std::vector<glm::vec3> points;
-        points.reserve(m_Points.size());
-        for (const glm::ivec2 &p : m_Points) {
-            points.emplace_back(p.x, -p.y, m_Heightmap->At(p.x, p.y) * 2113.21);
-        }
-        return points;
-    }
-
-    std::vector<glm::ivec3> Triangles() const {
-        std::vector<glm::ivec3> triangles;
-        triangles.reserve(m_Queue.size());
-        for (const int i : m_Queue) {
-            triangles.emplace_back(
-                m_Triangles[i * 3 + 0],
-                m_Triangles[i * 3 + 1],
-                m_Triangles[i * 3 + 2]);
-        }
-        return triangles;
-    }
 
 private:
     int AddPoint(const glm::ivec2 point);
