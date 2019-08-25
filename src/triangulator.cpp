@@ -17,7 +17,7 @@ Triangulator::Triangulator(const std::shared_ptr<Heightmap> &heightmap) :
 
     // add initial two triangles
     const int t0 = AddTriangle(p3, p0, p2, -1, -1, -1);
-    AddTriangle(p0, p3, p1, t0 * 3, -1, -1);
+    AddTriangle(p0, p3, p1, t0, -1, -1);
 }
 
 float Triangulator::Error() const {
@@ -36,10 +36,6 @@ void Triangulator::Step() {
     const int p1 = m_Triangles[e1];
     const int p2 = m_Triangles[e2];
 
-    const int h0 = m_Halfedges[e0];
-    const int h1 = m_Halfedges[e1];
-    const int h2 = m_Halfedges[e2];
-
     const glm::ivec2 a = m_Points[p0];
     const glm::ivec2 b = m_Points[p1];
     const glm::ivec2 c = m_Points[p2];
@@ -48,55 +44,43 @@ void Triangulator::Step() {
     const int pn = AddPoint(p);
 
     const auto handleCollinear = [this](const int pn, const int a) {
-        const int b = m_Halfedges[a];
-
-        if (b < 0) {
-            const int a0 = a - a % 3;
-            const int al = a0 + (a + 1) % 3;
-            const int ar = a0 + (a + 2) % 3;
-            const int p0 = m_Triangles[ar];
-            const int pr = m_Triangles[a];
-            const int pl = m_Triangles[al];
-            const int hal = m_Halfedges[al];
-            const int har = m_Halfedges[ar];
-            const int t0 = AddTriangle(pn, p0, pr, -1, har, -1);
-            const int t1 = AddTriangle(p0, pn, pl, t0 * 3, -1, hal);
-            Legalize(t0 * 3 + 1);
-            Legalize(t1 * 3 + 2);
-            return;
-        }
-
         const int a0 = a - a % 3;
-        const int b0 = b - b % 3;
-
         const int al = a0 + (a + 1) % 3;
         const int ar = a0 + (a + 2) % 3;
-        const int bl = b0 + (b + 2) % 3;
-        const int br = b0 + (b + 1) % 3;
-
         const int p0 = m_Triangles[ar];
         const int pr = m_Triangles[a];
         const int pl = m_Triangles[al];
-        const int p1 = m_Triangles[bl];
-
         const int hal = m_Halfedges[al];
         const int har = m_Halfedges[ar];
+
+        const int b = m_Halfedges[a];
+
+        if (b < 0) {
+            const int t0 = AddTriangle(pn, p0, pr, -1, har, -1);
+            const int t1 = AddTriangle(p0, pn, pl, t0, -1, hal);
+            Legalize(t0 + 1);
+            Legalize(t1 + 2);
+            return;
+        }
+
+        const int b0 = b - b % 3;
+        const int bl = b0 + (b + 2) % 3;
+        const int br = b0 + (b + 1) % 3;
+        const int p1 = m_Triangles[bl];
         const int hbl = m_Halfedges[bl];
         const int hbr = m_Halfedges[br];
 
-        const int bt = b / 3;
-        QueueRemove(bt);
+        QueueRemove(b / 3);
 
         const int t0 = AddTriangle(p0, pr, pn, har, -1, -1);
-        const int t1 = AddTriangle(pr, p1, pn, hbr, -1, t0 * 3 + 1);
-        const int t2 = AddTriangle(p1, pl, pn, hbl, -1, t1 * 3 + 1);
-        const int t3 = AddTriangle(pl, p0, pn, hal, t0 * 3 + 2, t2 * 3 + 1);
-        Legalize(t0 * 3);
-        Legalize(t1 * 3);
-        Legalize(t2 * 3);
-        Legalize(t3 * 3);
+        const int t1 = AddTriangle(pr, p1, pn, hbr, -1, t0 + 1);
+        const int t2 = AddTriangle(p1, pl, pn, hbl, -1, t1 + 1);
+        const int t3 = AddTriangle(pl, p0, pn, hal, t0 + 2, t2 + 1);
 
-        UnlinkTriangle(bt);
+        Legalize(t0);
+        Legalize(t1);
+        Legalize(t2);
+        Legalize(t3);
     };
 
     if (Collinear(a, b, p)) {
@@ -106,15 +90,18 @@ void Triangulator::Step() {
     } else if (Collinear(c, a, p)) {
         handleCollinear(pn, e2);
     } else {
-        const int t0 = AddTriangle(p0, p1, pn, h0, -1, -1);
-        const int t1 = AddTriangle(p1, p2, pn, h1, -1, t0 * 3 + 1);
-        const int t2 = AddTriangle(p2, p0, pn, h2, t0 * 3 + 2, t1 * 3 + 1);
-        Legalize(t0 * 3);
-        Legalize(t1 * 3);
-        Legalize(t2 * 3);
-    }
+        const int h0 = m_Halfedges[e0];
+        const int h1 = m_Halfedges[e1];
+        const int h2 = m_Halfedges[e2];
 
-    UnlinkTriangle(t);
+        const int t0 = AddTriangle(p0, p1, pn, h0, -1, -1);
+        const int t1 = AddTriangle(p1, p2, pn, h1, -1, t0 + 1);
+        const int t2 = AddTriangle(p2, p0, pn, h2, t0 + 2, t1 + 1);
+
+        Legalize(t0);
+        Legalize(t1);
+        Legalize(t2);
+    }
 }
 
 int Triangulator::AddPoint(const glm::ivec2 point) {
@@ -143,30 +130,23 @@ int Triangulator::AddTriangle(
     m_Halfedges.push_back(bc);
     m_Halfedges.push_back(ca);
     // link neighboring halfedges
-    if (ab >= 0) m_Halfedges[ab] = e + 0;
-    if (bc >= 0) m_Halfedges[bc] = e + 1;
-    if (ca >= 0) m_Halfedges[ca] = e + 2;
+    if (ab >= 0) {
+        m_Halfedges[ab] = e + 0;
+    }
+    if (bc >= 0) {
+        m_Halfedges[bc] = e + 1;
+    }
+    if (ca >= 0) {
+        m_Halfedges[ca] = e + 2;
+    }
     // add triangle metadata
     m_Candidates.push_back(pair.first);
     m_Errors.push_back(pair.second);
     m_QueueIndexes.push_back(-1);
     // add triangle to priority queue
     QueuePush(t);
-    // return triangle index
-    return t;
-}
-
-void Triangulator::UnlinkTriangle(const int t) {
-    m_Halfedges[t * 3 + 0] = -1;
-    m_Halfedges[t * 3 + 1] = -1;
-    m_Halfedges[t * 3 + 2] = -1;
-}
-
-void Triangulator::Link(const int a, const int b) {
-    m_Halfedges[a] = b;
-    if (b >= 0) {
-        m_Halfedges[b] = a;
-    }
+    // return first halfedge index
+    return e;
 }
 
 void Triangulator::Legalize(const int a) {
@@ -213,18 +193,14 @@ void Triangulator::Legalize(const int a) {
     const int hbl = m_Halfedges[bl];
     const int hbr = m_Halfedges[br];
 
-    const int at = a / 3;
-    const int bt = b / 3;
-    QueueRemove(at);
-    QueueRemove(bt);
-    UnlinkTriangle(at);
-    UnlinkTriangle(bt);
+    QueueRemove(a / 3);
+    QueueRemove(b / 3);
 
     const int t0 = AddTriangle(p0, p1, pl, -1, hbl, hal);
-    const int t1 = AddTriangle(p1, p0, pr, t0 * 3, har, hbr);
+    const int t1 = AddTriangle(p1, p0, pr, t0, har, hbr);
 
-    Legalize(t0 * 3 + 1);
-    Legalize(t1 * 3 + 2);
+    Legalize(t0 + 1);
+    Legalize(t1 + 2);
 }
 
 // priority queue functions
@@ -275,7 +251,8 @@ void Triangulator::QueueSwap(const int i, const int j) {
     m_QueueIndexes[pj] = i;
 }
 
-void Triangulator::QueueUp(int j) {
+void Triangulator::QueueUp(const int j0) {
+    int j = j0;
     while (1) {
         int i = (j - 1) / 2;
         if (i == j || !QueueLess(j, i)) {
