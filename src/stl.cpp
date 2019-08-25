@@ -3,6 +3,7 @@
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <fstream>
+#include <glm/gtx/normal.hpp>
 
 using namespace boost::interprocess;
 
@@ -31,13 +32,15 @@ void SaveBinarySTL(
     memcpy(dst + 80, &count, 4);
 
     for (uint32_t i = 0; i < triangles.size(); i++) {
-        const glm::ivec3 &t = triangles[i];
-        // const glm::vec3 normal = t.Normal();
-        const glm::vec3 normal(0);
+        const glm::ivec3 t = triangles[i];
+        const glm::vec3 p0 = points[t.x];
+        const glm::vec3 p1 = points[t.y];
+        const glm::vec3 p2 = points[t.z];
+        const glm::vec3 normal = glm::triangleNormal(p0, p1, p2);
         const uint64_t idx = 84 + i * 50;
-        memcpy(dst + idx + 0, &normal, 12);
-        memcpy(dst + idx + 12, &points[t.x], 12);
-        memcpy(dst + idx + 24, &points[t.y], 12);
-        memcpy(dst + idx + 36, &points[t.z], 12);
+        memcpy(dst + idx, &normal, 12);
+        memcpy(dst + idx + 12, &p0, 12);
+        memcpy(dst + idx + 24, &p1, 12);
+        memcpy(dst + idx + 36, &p2, 12);
     }
 }
