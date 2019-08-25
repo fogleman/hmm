@@ -1,7 +1,5 @@
 #include "triangulator.h"
 
-#include "geometry.h"
-
 Triangulator::Triangulator(const std::shared_ptr<Heightmap> &heightmap) :
     m_Heightmap(heightmap)
 {
@@ -43,6 +41,12 @@ void Triangulator::Step() {
 
     const int pn = AddPoint(p);
 
+    const auto collinear = [](
+        const glm::ivec2 p0, const glm::ivec2 p1, const glm::ivec2 p2)
+    {
+        return (p1.y-p0.y)*(p2.x-p1.x) == (p2.y-p1.y)*(p1.x-p0.x);
+    };
+
     const auto handleCollinear = [this](const int pn, const int a) {
         const int a0 = a - a % 3;
         const int al = a0 + (a + 1) % 3;
@@ -83,11 +87,11 @@ void Triangulator::Step() {
         Legalize(t3);
     };
 
-    if (Collinear(a, b, p)) {
+    if (collinear(a, b, p)) {
         handleCollinear(pn, e0);
-    } else if (Collinear(b, c, p)) {
+    } else if (collinear(b, c, p)) {
         handleCollinear(pn, e1);
-    } else if (Collinear(c, a, p)) {
+    } else if (collinear(c, a, p)) {
         handleCollinear(pn, e2);
     } else {
         const int h0 = m_Halfedges[e0];
@@ -165,6 +169,22 @@ void Triangulator::Legalize(const int a) {
     //          \||/                  \  /
     //           pr                    pr
 
+    const auto inCircle = [](
+        const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c,
+        const glm::ivec2 p)
+    {
+        const int64_t dx = a.x - p.x;
+        const int64_t dy = a.y - p.y;
+        const int64_t ex = b.x - p.x;
+        const int64_t ey = b.y - p.y;
+        const int64_t fx = c.x - p.x;
+        const int64_t fy = c.y - p.y;
+        const int64_t ap = dx * dx + dy * dy;
+        const int64_t bp = ex * ex + ey * ey;
+        const int64_t cp = fx * fx + fy * fy;
+        return dx*(ey*cp-bp*fy)-dy*(ex*cp-bp*fx)+ap*(ex*fy-ey*fx) < 0;
+    };
+
     const int b = m_Halfedges[a];
 
     if (b < 0) {
@@ -184,7 +204,7 @@ void Triangulator::Legalize(const int a) {
     const int pl = m_Triangles[al];
     const int p1 = m_Triangles[bl];
 
-    if (!InCircle(m_Points[p0], m_Points[pr], m_Points[pl], m_Points[p1])) {
+    if (!inCircle(m_Points[p0], m_Points[pr], m_Points[pl], m_Points[p1])) {
         return;
     }
 
