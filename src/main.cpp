@@ -1,15 +1,17 @@
 #include <iostream>
 
 #include "heightmap.h"
+#include "pool.h"
 #include "stl.h"
 #include "triangulator.h"
 
 int main(int argc, char **argv) {
     const auto hm = std::make_shared<Heightmap>(argv[1]);
+    const auto pool = std::make_shared<ThreadPool>();
 
     printf("%dx%d\n", hm->Width(), hm->Height());
 
-    Triangulator tri(hm);
+    Triangulator tri(hm, pool);
     while (tri.Error() > 0.001) {
     // while (tri.NumTriangles() < 1000000) {
         tri.Step();

@@ -5,10 +5,13 @@
 #include <vector>
 
 #include "heightmap.h"
+#include "pool.h"
 
 class Triangulator {
 public:
-    Triangulator(const std::shared_ptr<Heightmap> &heightmap);
+    Triangulator(
+        const std::shared_ptr<Heightmap> &heightmap,
+        const std::shared_ptr<ThreadPool> &pool);
 
     int NumPoints() const {
         return m_Points.size();
@@ -47,6 +50,7 @@ private:
     bool QueueDown(const int i0, const int n);
 
     std::shared_ptr<Heightmap> m_Heightmap;
+    std::shared_ptr<ThreadPool> m_Pool;
 
     std::vector<glm::ivec2> m_Points;
 
