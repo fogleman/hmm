@@ -16,6 +16,7 @@ Triangulator::Triangulator(const std::shared_ptr<Heightmap> &heightmap) :
     // add initial two triangles
     const int t0 = AddTriangle(p3, p0, p2, -1, -1, -1);
     AddTriangle(p0, p3, p1, t0, -1, -1);
+    Flush();
 }
 
 float Triangulator::Error() const {
@@ -41,6 +42,23 @@ std::vector<glm::ivec3> Triangulator::Triangles() const {
             m_Triangles[i * 3 + 2]);
     }
     return triangles;
+}
+
+void Triangulator::Flush() {
+    // TODO: rasterize in parallel?
+    for (const int t : m_Pending) {
+        // rasterize triangle to find maximum pixel error
+        const auto pair = m_Heightmap->FindCandidate(
+            m_Points[m_Triangles[t*3+0]],
+            m_Points[m_Triangles[t*3+1]],
+            m_Points[m_Triangles[t*3+2]]);
+        // update metadata
+        m_Candidates[t] = pair.first;
+        m_Errors[t] = pair.second;
+        // add triangle to priority queue
+        QueuePush(t);
+    }
+    m_Pending.clear();
 }
 
 void Triangulator::Step() {
@@ -127,6 +145,8 @@ void Triangulator::Step() {
         Legalize(t1);
         Legalize(t2);
     }
+
+    Flush();
 }
 
 int Triangulator::AddPoint(const glm::ivec2 point) {
@@ -139,9 +159,6 @@ int Triangulator::AddTriangle(
     const int a, const int b, const int c,
     const int ab, const int bc, const int ca)
 {
-    // rasterize triangle to find maximum pixel error
-    const auto pair = m_Heightmap->FindCandidate(
-        m_Points[a], m_Points[b], m_Points[c]);
     // new triangle index
     const int t = m_Candidates.size();
     // new halfedge index
@@ -165,11 +182,11 @@ int Triangulator::AddTriangle(
         m_Halfedges[ca] = e + 2;
     }
     // add triangle metadata
-    m_Candidates.push_back(pair.first);
-    m_Errors.push_back(pair.second);
+    m_Candidates.emplace_back(0);
+    m_Errors.push_back(0);
     m_QueueIndexes.push_back(-1);
-    // add triangle to priority queue
-    QueuePush(t);
+    // add triangle to pending queue for later rasterization
+    m_Pending.push_back(t);
     // return first halfedge index
     return e;
 }
@@ -267,6 +284,16 @@ int Triangulator::QueuePopBack() {
 
 void Triangulator::QueueRemove(const int t) {
     const int i = m_QueueIndexes[t];
+    if (i < 0) {
+        const auto it = std::find(m_Pending.begin(), m_Pending.end(), t);
+        if (it != m_Pending.end()) {
+            std::swap(*it, m_Pending.back());
+            m_Pending.pop_back();
+        } else {
+            // this shouldn't happen!
+        }
+        return;
+    }
     const int n = m_Queue.size() - 1;
     if (n != i) {
         QueueSwap(i, n);

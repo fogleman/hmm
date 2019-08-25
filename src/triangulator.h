@@ -27,6 +27,8 @@ public:
     void Step();
 
 private:
+    void Flush();
+
     int AddPoint(const glm::ivec2 point);
 
     int AddTriangle(
@@ -56,4 +58,6 @@ private:
     std::vector<int> m_QueueIndexes;
 
     std::vector<int> m_Queue;
+
+    std::vector<int> m_Pending;
 };
