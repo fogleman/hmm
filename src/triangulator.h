@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <memory>
 #include <vector>
 
 #include "heightmap.h"
@@ -19,7 +20,7 @@ public:
         std::vector<glm::vec3> points;
         points.reserve(m_Points.size());
         for (const glm::ivec2 &p : m_Points) {
-            points.emplace_back(p.x, p.y, m_Heightmap->At(p.x, p.y) * 200);
+            points.emplace_back(p.x, -p.y, m_Heightmap->At(p.x, p.y) * 2113.21);
         }
         return points;
     }
@@ -29,9 +30,9 @@ public:
         triangles.reserve(m_Queue.size());
         for (const int i : m_Queue) {
             triangles.emplace_back(
-                m_Triangles[i * 3 + 2],
+                m_Triangles[i * 3 + 0],
                 m_Triangles[i * 3 + 1],
-                m_Triangles[i * 3 + 0]);
+                m_Triangles[i * 3 + 2]);
         }
         return triangles;
     }
