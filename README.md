@@ -16,6 +16,11 @@ triangles or vertices. It's also very fast.
 
 ![Example](https://i.imgur.com/2yNhUSV.png)
 
+### Dependencies
+
+- C++11 or higher
+- [glm](https://glm.g-truc.net/0.9.9/index.html)
+
 ### Installation
 
 ```bash
