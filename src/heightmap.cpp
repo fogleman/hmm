@@ -23,6 +23,15 @@ Heightmap::Heightmap(const std::string &path) :
     free(data);
 }
 
+Heightmap::Heightmap(
+    const int width,
+    const int height,
+    const std::vector<float> &data) :
+    m_Width(width),
+    m_Height(height),
+    m_Data(data)
+{}
+
 std::pair<glm::ivec2, float> Heightmap::FindCandidate(
     const glm::ivec2 p0,
     const glm::ivec2 p1,

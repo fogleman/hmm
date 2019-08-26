@@ -13,6 +13,11 @@ public:
         const std::shared_ptr<Heightmap> &heightmap,
         const std::shared_ptr<ThreadPool> &pool);
 
+    void Run(
+        const float maxError,
+        const int maxTriangles,
+        const int maxPoints);
+
     int NumPoints() const {
         return m_Points.size();
     }
@@ -27,10 +32,10 @@ public:
 
     std::vector<glm::ivec3> Triangles() const;
 
-    void Step();
-
 private:
     void Flush();
+
+    void Step();
 
     int AddPoint(const glm::ivec2 point);
 

@@ -4,7 +4,12 @@ Triangulator::Triangulator(
     const std::shared_ptr<Heightmap> &heightmap,
     const std::shared_ptr<ThreadPool> &pool) :
     m_Heightmap(heightmap),
-    m_Pool(pool)
+    m_Pool(pool) {}
+
+void Triangulator::Run(
+    const float maxError,
+    const int maxTriangles,
+    const int maxPoints)
 {
     // add points at all four corners
     const int x0 = 0;
@@ -20,6 +25,24 @@ Triangulator::Triangulator(
     const int t0 = AddTriangle(p3, p0, p2, -1, -1, -1);
     AddTriangle(p0, p3, p1, t0, -1, -1);
     Flush();
+
+    // helper function to check if triangulation is complete
+    const auto done = [this, maxError, maxTriangles, maxPoints]() {
+        if (Error() <= maxError) {
+            return true;
+        }
+        if (maxTriangles > 0 && NumTriangles() >= maxTriangles) {
+            return true;
+        }
+        if (maxPoints > 0 && NumPoints() >= maxPoints) {
+            return true;
+        }
+        return false;
+    };
+
+    while (!done()) {
+        Step();
+    }
 }
 
 float Triangulator::Error() const {

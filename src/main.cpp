@@ -95,30 +95,10 @@ int main(int argc, char **argv) {
     // create thread pool
     const auto pool = std::make_shared<ThreadPool>();
 
-    // construct triangulator
+    // triangulate
     done = timed("triangulating");
     Triangulator tri(hm, pool);
-
-    // helper function to check if triangulation is complete
-    const auto isDone = [&tri, maxError, maxTriangles, maxPoints]() {
-        if (tri.Error() <= maxError) {
-            return true;
-        }
-        if (maxTriangles > 0 && tri.NumTriangles() >= maxTriangles) {
-            return true;
-        }
-        if (maxPoints > 0 && tri.NumPoints() >= maxPoints) {
-            return true;
-        }
-        return false;
-    };
-
-    // triangulate
-    while (!isDone()) {
-        tri.Step();
-    }
-
-    // extract triangulation
+    tri.Run(maxError, maxTriangles, maxPoints);
     const auto points = tri.Points(zScale * zExaggeration);
     const auto triangles = tri.Triangles();
     done();

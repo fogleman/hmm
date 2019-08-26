@@ -9,6 +9,11 @@ class Heightmap {
 public:
     Heightmap(const std::string &path);
 
+    Heightmap(
+        const int width,
+        const int height,
+        const std::vector<float> &data);
+
     int Width() const {
         return m_Width;
     }
