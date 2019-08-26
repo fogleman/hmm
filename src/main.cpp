@@ -5,7 +5,6 @@
 #include "base.h"
 #include "cmdline.h"
 #include "heightmap.h"
-#include "pool.h"
 #include "stl.h"
 #include "triangulator.h"
 
@@ -79,12 +78,9 @@ int main(int argc, char **argv) {
         printf("  %d x %d = %d pixels\n", w, h, w * h);
     }
 
-    // create thread pool
-    const auto pool = std::make_shared<ThreadPool>();
-
     // triangulate
     done = timed("triangulating");
-    Triangulator tri(hm, pool);
+    Triangulator tri(hm);
     tri.Run(maxError, maxTriangles, maxPoints);
     auto points = tri.Points(zScale * zExaggeration);
     auto triangles = tri.Triangles();

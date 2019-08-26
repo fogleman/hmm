@@ -1,10 +1,7 @@
 #include "triangulator.h"
 
-Triangulator::Triangulator(
-    const std::shared_ptr<Heightmap> &heightmap,
-    const std::shared_ptr<ThreadPool> &pool) :
-    m_Heightmap(heightmap),
-    m_Pool(pool) {}
+Triangulator::Triangulator(const std::shared_ptr<Heightmap> &heightmap) :
+    m_Heightmap(heightmap) {}
 
 void Triangulator::Run(
     const float maxError,
@@ -72,58 +69,17 @@ std::vector<glm::ivec3> Triangulator::Triangles() const {
 }
 
 void Triangulator::Flush() {
-    // use thread pool only if some triangles are large
-    const bool usePool = [this]() {
-        for (const int t : m_Pending) {
-            const glm::ivec2 p0 = m_Points[m_Triangles[t*3+0]];
-            const glm::ivec2 p1 = m_Points[m_Triangles[t*3+1]];
-            const glm::ivec2 p2 = m_Points[m_Triangles[t*3+2]];
-            const glm::ivec2 min = glm::min(glm::min(p0, p1), p2);
-            const glm::ivec2 max = glm::max(glm::max(p0, p1), p2);
-            const glm::ivec2 size = max - min;
-            if (size.x * size.y > 64 * 64) {
-                return true;
-            }
-        }
-        return false;
-    }();
-
-    if (usePool) {
-        std::vector<std::future<void>> results;
-
-        for (const int t : m_Pending) {
-            results.push_back(m_Pool->Add([this, t]() {
-                // rasterize triangle to find maximum pixel error
-                const auto pair = m_Heightmap->FindCandidate(
-                    m_Points[m_Triangles[t*3+0]],
-                    m_Points[m_Triangles[t*3+1]],
-                    m_Points[m_Triangles[t*3+2]]);
-                // update metadata
-                m_Candidates[t] = pair.first;
-                m_Errors[t] = pair.second;
-            }));
-        }
-
-        for (auto &r : results) {
-            r.get();
-        }
-
-        for (const int t : m_Pending) {
-            QueuePush(t);
-        }
-    } else {
-        for (const int t : m_Pending) {
-            // rasterize triangle to find maximum pixel error
-            const auto pair = m_Heightmap->FindCandidate(
-                m_Points[m_Triangles[t*3+0]],
-                m_Points[m_Triangles[t*3+1]],
-                m_Points[m_Triangles[t*3+2]]);
-            // update metadata
-            m_Candidates[t] = pair.first;
-            m_Errors[t] = pair.second;
-            // add triangle to priority queue
-            QueuePush(t);
-        }
+    for (const int t : m_Pending) {
+        // rasterize triangle to find maximum pixel error
+        const auto pair = m_Heightmap->FindCandidate(
+            m_Points[m_Triangles[t*3+0]],
+            m_Points[m_Triangles[t*3+1]],
+            m_Points[m_Triangles[t*3+2]]);
+        // update metadata
+        m_Candidates[t] = pair.first;
+        m_Errors[t] = pair.second;
+        // add triangle to priority queue
+        QueuePush(t);
     }
 
     m_Pending.clear();
