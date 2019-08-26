@@ -96,9 +96,11 @@ int main(int argc, char **argv) {
 
     // display statistics
     if (!quiet) {
+        const int naiveTriangleCount = (w - 1) * (h - 1) * 2;
         printf("  error = %g\n", tri.Error());
         printf("  points = %ld\n", points.size());
         printf("  triangles = %ld\n", triangles.size());
+        printf("  vs. naive = %g%%\n", 100.f * triangles.size() / naiveTriangleCount);
     }
 
     // write output file
