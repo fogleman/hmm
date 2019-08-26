@@ -84,7 +84,7 @@ Performance depends a lot on the amount of detail in the heightmap, but here are
 
 #### Runtime in Seconds
 
-| Image Size / Error | e=0.01 | e=0.001 | e=0.005 | e=0.0001 |
+| Image Size / Error | e=0.01 | e=0.001 | e=0.0005 | e=0.0001 |
 | ---: | ---: | ---: | ---: | ---: |
 | 9490 x 9490 px (90.0 MP) | 6.535 | 13.102 | 19.394 | 58.949 |
 | 4745 x 4745 px (22.5 MP) | 1.867 |  4.903 |  8.886 | 33.327 |
@@ -93,7 +93,7 @@ Performance depends a lot on the amount of detail in the heightmap, but here are
 
 #### Number of Triangles Output
 
-| Image Size / Error | e=0.01 | e=0.001 | e=0.005 | e=0.0001 |
+| Image Size / Error | e=0.01 | e=0.001 | e=0.0005 | e=0.0001 |
 | ---: | ---: | ---: | ---: | ---: |
 | 9490 x 9490 px (90.0 MP) | 33,869 | 1,084,972 | 2,467,831 | 14,488,022 |
 | 4745 x 4745 px (22.5 MP) | 33,148 | 1,032,263 | 2,323,772 | 11,719,491 |
