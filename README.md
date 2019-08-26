@@ -11,6 +11,8 @@ a good tool for this purpose.
 Terrains and Height Fields](http://mgarland.org/files/papers/scape.pdf) by Garland and Heckbert. The meshes produced by `hmm` satisfy the Delaunay condition and can satisfy a specified maximal error or maximal number of
 triangles or vertices. It's also very fast.
 
+![Example](https://i.imgur.com/2yNhUSV.png)
+
 ### Installation
 
 ```bash
