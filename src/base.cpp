@@ -9,7 +9,6 @@ void AddBase(
     std::vector<glm::ivec3> &triangles,
     const int w, const int h, const float z)
 {
-    // lookup points along each edge
     const int w1 = w - 1;
     const int h1 = h - 1;
 
@@ -17,17 +16,28 @@ void AddBase(
     std::map<int, float> x1s;
     std::map<int, float> y0s;
     std::map<int, float> y1s;
+    std::unordered_map<glm::vec3, int> lookup;
 
-    for (const auto &p : points) {
+    // find points along each edge
+    for (int i = 0; i < points.size(); i++) {
+        const auto &p = points[i];
+        bool edge = false;
         if (p.x == 0) {
             x0s[p.y] = p.z;
+            edge = true;
         } else if (p.x == w1) {
             x1s[p.y] = p.z;
+            edge = true;
         }
         if (p.y == 0) {
             y0s[p.x] = p.z;
+            edge = true;
         } else if (p.y == h1) {
             y1s[p.x] = p.z;
+            edge = true;
+        }
+        if (edge) {
+            lookup[p] = i;
         }
     }
 
@@ -35,12 +45,6 @@ void AddBase(
     std::vector<std::pair<int, float>> sx1s(x1s.begin(), x1s.end());
     std::vector<std::pair<int, float>> sy0s(y0s.begin(), y0s.end());
     std::vector<std::pair<int, float>> sy1s(y1s.begin(), y1s.end());
-
-    // build point lookup table
-    std::unordered_map<glm::vec3, int> lookup;
-    for (int i = 0; i < points.size(); i++) {
-        lookup[points[i]] = i;
-    }
 
     const auto pointIndex = [&lookup, &points](
         const float x, const float y, const float z)
