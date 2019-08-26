@@ -109,3 +109,5 @@ Performance depends a lot on the amount of detail in the heightmap, but here are
 - better overflow handling - what's the largest supported heightmap?
 - OpenCL rasterization?
 - mesh validation?
+- reconstruct grayscale image?
+- explicit lithophane support?
