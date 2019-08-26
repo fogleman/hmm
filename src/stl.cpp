@@ -1,32 +1,17 @@
 #include "stl.h"
 
-#include <boost/interprocess/file_mapping.hpp>
-#include <boost/interprocess/mapped_region.hpp>
 #include <fstream>
 #include <glm/gtx/normal.hpp>
-
-using namespace boost::interprocess;
 
 void SaveBinarySTL(
     const std::string &path,
     const std::vector<glm::vec3> &points,
     const std::vector<glm::ivec3> &triangles)
 {
+    // TODO: properly handle endian-ness
+
     const uint64_t numBytes = uint64_t(triangles.size()) * 50 + 84;
-
-    {
-        file_mapping::remove(path.c_str());
-        std::filebuf fbuf;
-        fbuf.open(path.c_str(),
-            std::ios_base::in | std::ios_base::out | std::ios_base::trunc |
-            std::ios_base::binary);
-        fbuf.pubseekoff(numBytes - 1, std::ios_base::beg);
-        fbuf.sputc(0);
-    }
-
-    file_mapping fm(path.c_str(), read_write);
-    mapped_region mr(fm, read_write);
-    uint8_t *dst = (uint8_t *)mr.get_address();
+    char *dst = (char *)calloc(numBytes, 1);
 
     const uint32_t count = triangles.size();
     memcpy(dst + 80, &count, 4);
@@ -43,4 +28,10 @@ void SaveBinarySTL(
         memcpy(dst + idx + 24, &p1, 12);
         memcpy(dst + idx + 36, &p2, 12);
     }
+
+    std::fstream file(path, std::ios::out | std::ios::binary);
+    file.write(dst, numBytes);
+    file.close();
+
+    free(dst);
 }

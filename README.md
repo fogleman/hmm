@@ -19,7 +19,7 @@ triangles or vertices. It's also very fast.
 ### Installation
 
 ```bash
-brew install boost glm # on macOS
+brew install glm # on macOS
 git clone https://github.com/fogleman/hmm.git
 cd hmm
 make
@@ -60,6 +60,5 @@ vertices. (If multiple are specified, the first one reached is used.)
 - better error handling, especially for file I/O
 - better overflow handling - what's the largest supported heightmap?
 - thread pool doesn't help much usually - get rid of it?
-- remove boost dependency, not really needed
 - OpenCL rasterization?
 - mesh validation?
