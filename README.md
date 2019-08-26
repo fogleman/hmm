@@ -52,14 +52,14 @@ parameter is ZSCALE, which specifies how much to scale the Z axis in the output
 mesh.
 
 ```bash
-    $ hmm input.png output.stl -z ZSCALE
+$ hmm input.png output.stl -z ZSCALE
 ```
 
 You can also provide a maximal allowed error, number of triangles, or number of
 vertices. (If multiple are specified, the first one reached is used.)
 
 ```bash
-    $ hmm input.png output.stl -z 100 -e 0.001 -t 1000000
+$ hmm input.png output.stl -z 100 -e 0.001 -t 1000000
 ```
 
 ### TODO
