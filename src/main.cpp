@@ -2,6 +2,7 @@
 #include <functional>
 #include <iostream>
 
+#include "base.h"
 #include "cmdline.h"
 #include "heightmap.h"
 #include "pool.h"
@@ -13,7 +14,6 @@
 TODO / NOTES
 ============
 - thread pool doesn't help much usually - get rid of it?
-- add a solid base
 - export a normal map?
 - automatically compute some z scale?
 - better error handling, especially for file I/O
@@ -37,6 +37,7 @@ int main(int argc, char **argv) {
     p.add<float>("error", 'e', "maximum triangulation error", false, 0.001);
     p.add<int>("triangles", 't', "maximum number of triangles", false, 0);
     p.add<int>("points", 'p', "maximum number of vertices", false, 0);
+    p.add<float>("base", 'b', "solid base height", false, 0);
     p.add("quiet", 'q', "suppress console output");
     p.footer("infile outfile.stl");
     p.parse_check(argc, argv);
@@ -54,6 +55,7 @@ int main(int argc, char **argv) {
     const float maxError = p.get<float>("error");
     const int maxTriangles = p.get<int>("triangles");
     const int maxPoints = p.get<int>("points");
+    const float baseHeight = p.get<float>("base");
     const bool quiet = p.exist("quiet");
 
     // helper function to display elapsed time of each step
@@ -99,9 +101,17 @@ int main(int argc, char **argv) {
     done = timed("triangulating");
     Triangulator tri(hm, pool);
     tri.Run(maxError, maxTriangles, maxPoints);
-    const auto points = tri.Points(zScale * zExaggeration);
-    const auto triangles = tri.Triangles();
+    auto points = tri.Points(zScale * zExaggeration);
+    auto triangles = tri.Triangles();
     done();
+
+    // add base
+    if (baseHeight > 0) {
+        done = timed("adding solid base");
+        const float z = -baseHeight * zScale * zExaggeration;
+        AddBase(points, triangles, w, h, z);
+        done();
+    }
 
     // display statistics
     if (!quiet) {
