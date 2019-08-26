@@ -70,6 +70,10 @@ The required `-z` parameter defines the distance between a fully black pixel and
 
 The `-x` parameter is simply an extra multiplier on top of the provided Z scale. It is provided as a convenience so you don't have to do multiplication in your head just to exaggerate by, e.g. 2x, since Z scales are often derived from real world data and can have strange values like 142.2378.
 
+### Max Error
+
+The `-e` parameter defines the maximum allowed error in the output mesh, as a percentage of the total mesh height. For example, if `-e 0.01` is used, then no pixel will have an error of more than 1% of the distance between a fully black pixel and a fully white pixel. This means that for an 8-bit input image, an error of `e = 1 / 256 ~= 0.0039` will ensure that no pixel has an error greater than one full grayscale unit. (It may still be desireable to use a lower value like `0.5 / 256`.)
+
 ### Base Height
 
 When the `-b` option is used to create a solid mesh, it defines the height of the base before the lowest part of the heightmesh appears, as a percentage of the heightmap's height. For example, if `-z 100 -b 50` were used, then the final mesh would be 150 units tall.
