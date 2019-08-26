@@ -25,6 +25,8 @@ triangles or vertices. It's also very fast.
 
 ```bash
 brew install glm # on macOS
+sudo apt-get install libglm-dev # on Ubuntu / Debian
+
 git clone https://github.com/fogleman/hmm.git
 cd hmm
 make
