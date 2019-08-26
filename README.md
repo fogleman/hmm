@@ -3,7 +3,7 @@
 `hmm` is a <b>h</b>eight<b>m</b>ap <b>m</b>eshing utility.
 
 If you've done any 3D game development, 3D printing, or other such things,
-you've likely wanted to convert a grayscale heighmap image into a 3D mesh. The
+you've likely wanted to convert a grayscale heightmap image into a 3D mesh. The
 naive way is pretty simple but generates huge meshes with millions of
 triangles. After hacking my way through various solutions over the years, I
 finally decided I needed to write a good tool for this purpose.
