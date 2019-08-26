@@ -62,6 +62,14 @@ vertices. (If multiple are specified, the first one reached is used.)
 $ hmm input.png output.stl -z 100 -e 0.001 -t 1000000
 ```
 
+### Z Scale
+
+The required `-z` parameter defines the distance between a fully black pixel and a fully white pixel in the vertical Z axis, with units equal to one pixel width or height. For example, if each pixel in the heightmap represented a 1x1 meter square area, and the vertical range of the heightmap was 100 meters, then `-z 100` should be used.
+
+### Base Height
+
+When the `-b` option is used to create a solid mesh, it defines the height of the base before the lowest part of the heightmesh appears, as a percentage of the heightmap's height. For example, if `-z 100 -b 50` were used, then the final mesh would be 150 units tall.
+
 ### TODO
 
 - pre-triangulation filters? e.g. gaussian blur
