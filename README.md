@@ -13,9 +13,12 @@ triangles or vertices. It's also very fast.
 
 ### Installation
 
-    git clone https://github.com/fogleman/hmm.git
-    cd hmm
-    make
+```bash
+brew install boost glm # on macOS
+git clone https://github.com/fogleman/hmm.git
+cd hmm
+make
+```
 
 ### Usage
 
