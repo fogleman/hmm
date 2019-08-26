@@ -76,7 +76,7 @@ The `-e` parameter defines the maximum allowed error in the output mesh, as a pe
 
 ### Base Height
 
-When the `-b` option is used to create a solid mesh, it defines the height of the base before the lowest part of the heightmesh appears, as a percentage of the heightmap's height. For example, if `-z 100 -b 50` were used, then the final mesh would be 150 units tall.
+When the `-b` option is used to create a solid mesh, it defines the height of the base before the lowest part of the heightmesh appears, as a percentage of the heightmap's height. For example, if `-z 100 -b 50` were used, then the final mesh would be about 150 units tall (if a fully white pixel exists in the input).
 
 ### TODO
 
