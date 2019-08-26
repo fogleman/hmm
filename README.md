@@ -28,12 +28,13 @@ brew install glm # on macOS
 git clone https://github.com/fogleman/hmm.git
 cd hmm
 make
+make install
 ```
 
 ### Usage
 
 ```
-usage: ./hmm --zscale=float [options] ... infile outfile.stl
+usage: hmm --zscale=float [options] ... infile outfile.stl
 options:
   -z, --zscale       z scale relative to x & y (float)
   -x, --zexagg       z exaggeration (float [=1])
@@ -50,12 +51,16 @@ heightmap. The output is always a binary STL file. The only other required
 parameter is ZSCALE, which specifies how much to scale the Z axis in the output
 mesh.
 
-    ./hmm input.png output.stl -z ZSCALE
+```bash
+    $ hmm input.png output.stl -z ZSCALE
+```
 
 You can also provide a maximal allowed error, number of triangles, or number of
 vertices. (If multiple are specified, the first one reached is used.)
 
-    ./hmm input.png output.stl -z 100 -e 0.001 -t 1000000
+```bash
+    $ hmm input.png output.stl -z 100 -e 0.001 -t 1000000
+```
 
 ### TODO
 
