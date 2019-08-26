@@ -60,5 +60,6 @@ vertices. (If multiple are specified, the first one reached is used.)
 - better error handling, especially for file I/O
 - better overflow handling - what's the largest supported heightmap?
 - thread pool doesn't help much usually - get rid of it?
+- remove boost dependency, not really needed
 - OpenCL rasterization?
 - mesh validation?

@@ -9,21 +9,6 @@
 #include "stl.h"
 #include "triangulator.h"
 
-/*
-
-TODO / NOTES
-============
-- thread pool doesn't help much usually - get rid of it?
-- export a normal map?
-- automatically compute some z scale?
-- better error handling, especially for file I/O
-- better overflow handling - what's the largest supported heightmap?
-- pre-triangulation filters? e.g. gaussian blur
-- OpenCL rasterization?
-- mesh validation?
-
-*/
-
 int main(int argc, char **argv) {
     const auto startTime = std::chrono::steady_clock::now();
 
