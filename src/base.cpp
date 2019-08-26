@@ -70,9 +70,9 @@ void AddBase(
         const int p01 = pointIndex(0, y0, z0);
         const int p10 = pointIndex(0, y1, z);
         const int p11 = pointIndex(0, y1, z1);
-        triangles.emplace_back(p00, p10, p01);
-        triangles.emplace_back(p10, p11, p01);
-        triangles.emplace_back(p10, p00, center);
+        triangles.emplace_back(p01, p10, p00);
+        triangles.emplace_back(p01, p11, p10);
+        triangles.emplace_back(center, p00, p10);
     }
 
     // edge x = w1
@@ -85,9 +85,9 @@ void AddBase(
         const int p01 = pointIndex(w1, y0, z0);
         const int p10 = pointIndex(w1, y1, z);
         const int p11 = pointIndex(w1, y1, z1);
-        triangles.emplace_back(p01, p10, p00);
-        triangles.emplace_back(p01, p11, p10);
-        triangles.emplace_back(p00, p10, center);
+        triangles.emplace_back(p00, p10, p01);
+        triangles.emplace_back(p10, p11, p01);
+        triangles.emplace_back(center, p10, p00);
     }
 
     // edge y = 0
@@ -100,9 +100,9 @@ void AddBase(
         const int p01 = pointIndex(x0, 0, z0);
         const int p10 = pointIndex(x1, 0, z);
         const int p11 = pointIndex(x1, 0, z1);
-        triangles.emplace_back(p01, p10, p00);
-        triangles.emplace_back(p01, p11, p10);
-        triangles.emplace_back(p00, p10, center);
+        triangles.emplace_back(p00, p10, p01);
+        triangles.emplace_back(p10, p11, p01);
+        triangles.emplace_back(center, p10, p00);
     }
 
     // edge y = h1
@@ -115,8 +115,8 @@ void AddBase(
         const int p01 = pointIndex(x0, h1, z0);
         const int p10 = pointIndex(x1, h1, z);
         const int p11 = pointIndex(x1, h1, z1);
-        triangles.emplace_back(p00, p10, p01);
-        triangles.emplace_back(p10, p11, p01);
-        triangles.emplace_back(p10, p00, center);
+        triangles.emplace_back(p01, p10, p00);
+        triangles.emplace_back(p01, p11, p10);
+        triangles.emplace_back(center, p00, p10);
     }
 }
