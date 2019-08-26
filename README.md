@@ -78,6 +78,28 @@ The `-e` parameter defines the maximum allowed error in the output mesh, as a pe
 
 When the `-b` option is used to create a solid mesh, it defines the height of the base before the lowest part of the heightmesh appears, as a percentage of the heightmap's height. For example, if `-z 100 -b 50` were used, then the final mesh would be about 150 units tall (if a fully white pixel exists in the input).
 
+### Performance
+
+Performance depends a lot on the amount of detail in the heightmap, but here are some figures for an example heightmap of a 40x40 kilometer area centered on Mount Everest. Various heightmap resolutions and permitted max errors are shown.
+
+#### Runtime in Seconds
+
+| Image Size / Error | e=0.01 | e=0.001 | e=0.005 | e=0.0001 |
+| ---: | ---: | ---: | ---: | ---: |
+| 9490 x 9490 px (90.0 MP) | 6.535 | 13.102 | 19.394 | 58.949 |
+| 4745 x 4745 px (22.5 MP) | 1.867 |  4.903 |  8.886 | 33.327 |
+| 2373 x 2373 px  (5.6 MP) | 0.559 |  2.353 |  4.930 | 14.243 |
+| 1187 x 1187 px  (1.4 MP) | 0.168 |  1.021 |  1.961 |  3.709 |
+
+#### Number of Triangles Output
+
+| Image Size / Error | e=0.01 | e=0.001 | e=0.005 | e=0.0001 |
+| ---: | ---: | ---: | ---: | ---: |
+| 9490 x 9490 px (90.0 MP) | 33,869 | 1,084,972 | 2,467,831 | 14,488,022 |
+| 4745 x 4745 px (22.5 MP) | 33,148 | 1,032,263 | 2,323,772 | 11,719,491 |
+| 2373 x 2373 px  (5.6 MP) | 31,724 |   935,787 | 1,979,227 |  6,561,070 |
+| 1187 x 1187 px  (1.4 MP) | 27,275 |   629,352 | 1,160,079 |  2,347,713 |
+
 ### TODO
 
 - pre-triangulation filters? e.g. gaussian blur
