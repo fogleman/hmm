@@ -80,7 +80,7 @@ When the `-b` option is used to create a solid mesh, it defines the height of th
 
 ### Performance
 
-Performance depends a lot on the amount of detail in the heightmap, but here are some figures for an example heightmap of a [40x40 kilometer area centered on Mount Everest](https://i.imgur.com/1i9djJ0.png). Various heightmap resolutions and permitted max errors are shown. Times computed on a 2018 13" MacBook Pro (2.7 GHz Intel Core i7).
+Performance depends a lot on the amount of detail in the heightmap, but here are some figures for an example heightmap of a [40x40 kilometer area centered on Mount Everest](https://i.imgur.com/1i9djJ0.jpg). Various heightmap resolutions and permitted max errors are shown. Times computed on a 2018 13" MacBook Pro (2.7 GHz Intel Core i7).
 
 #### Runtime in Seconds
 
