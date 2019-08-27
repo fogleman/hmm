@@ -6,7 +6,26 @@
 #include "cmdline.h"
 #include "heightmap.h"
 #include "stl.h"
+#include "obj.h"
 #include "triangulator.h"
+
+static std::string GetFileExt(const std::string& fn)
+{
+    size_t pos = fn.find_last_of('.');
+    if (pos != std::string::npos)
+        return fn.substr(pos);
+    return "";
+}
+
+static bool StringEquals(const std::string& l, const std::string& r)
+{
+    return l.size() == r.size()
+        && std::equal(l.cbegin(), l.cend(), r.cbegin(),
+            [](std::string::value_type l1, std::string::value_type r1)
+    {
+        return toupper(l1) == toupper(r1);
+    });
+}
 
 int main(int argc, char **argv) {
     const auto startTime = std::chrono::steady_clock::now();
@@ -23,7 +42,7 @@ int main(int argc, char **argv) {
     p.add<int>("points", 'p', "maximum number of vertices", false, 0);
     p.add<float>("base", 'b', "solid base height", false, 0);
     p.add("quiet", 'q', "suppress console output");
-    p.footer("infile outfile.stl");
+    p.footer("infile outfile.{stl,obj}");
     p.parse_check(argc, argv);
 
     if (p.rest().size() != 2) {
@@ -105,7 +124,11 @@ int main(int argc, char **argv) {
 
     // write output file
     done = timed("writing output");
-    SaveBinarySTL(outFile, points, triangles);
+    std::string ext = GetFileExt(outFile);
+    if (StringEquals(ext, ".obj"))
+        SaveOBJ(outFile, points, triangles);
+    else
+        SaveBinarySTL(outFile, points, triangles);
     done();
 
     // show total elapsed time
