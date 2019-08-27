@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <glm/gtx/normal.hpp>
+#include <cstring>
 
 void SaveBinarySTL(
     const std::string &path,
