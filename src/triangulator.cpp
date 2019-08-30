@@ -27,7 +27,8 @@ void Triangulator::Run(
 
     // helper function to check if triangulation is complete
     const auto done = [this, maxError, maxTriangles, maxPoints]() {
-        if (Error() <= maxError) {
+        const float e = Error();
+        if (e <= maxError) {
             return true;
         }
         if (maxTriangles > 0 && NumTriangles() >= maxTriangles) {
@@ -36,7 +37,7 @@ void Triangulator::Run(
         if (maxPoints > 0 && NumPoints() >= maxPoints) {
             return true;
         }
-        return false;
+        return e == 0;
     };
 
     while (!done()) {
