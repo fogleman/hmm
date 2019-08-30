@@ -113,3 +113,5 @@ Performance depends a lot on the amount of detail in the heightmap, but here are
 - mesh validation?
 - reconstruct grayscale image?
 - explicit lithophane support?
+
+![Example](https://www.michaelfogleman.com/static/img/project/hmm/2.png)
