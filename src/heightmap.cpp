@@ -112,5 +112,9 @@ std::pair<glm::ivec2, float> Heightmap::FindCandidate(
         w02 += b01;
     }
 
+    if (maxPoint == p0 || maxPoint == p1 || maxPoint == p2) {
+        maxError = 0;
+    }
+
     return std::make_pair(maxPoint, maxError);
 }
