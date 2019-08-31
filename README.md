@@ -14,7 +14,7 @@ by Garland and Heckbert. The meshes produced by `hmm` satisfy the Delaunay
 condition and can satisfy a specified maximal error or maximal number of
 triangles or vertices. It's also very fast.
 
-![Example](https://i.imgur.com/2yNhUSV.png)
+![Example](https://i.imgur.com/xLGcmWS.png)
 
 ### Dependencies
 
@@ -113,5 +113,3 @@ Performance depends a lot on the amount of detail in the heightmap, but here are
 - mesh validation?
 - reconstruct grayscale image?
 - explicit lithophane support?
-
-![Example](https://www.michaelfogleman.com/static/img/project/hmm/2.png)
