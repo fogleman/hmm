@@ -24,6 +24,8 @@ int main(int argc, char **argv) {
     p.add<float>("base", 'b', "solid base height", false, 0);
     p.add("invert", '\0', "invert heightmap");
     p.add<int>("blur", '\0', "gaussian blur sigma", false, 0);
+    p.add<int>("border-size", '\0', "border size in pixels", false, 0);
+    p.add<float>("border-height", '\0', "border z height", false, 1);
     p.add("quiet", 'q', "suppress console output");
     p.footer("infile outfile.stl");
     p.parse_check(argc, argv);
@@ -44,6 +46,8 @@ int main(int argc, char **argv) {
     const float baseHeight = p.get<float>("base");
     const bool invert = p.exist("invert");
     const int blurSigma = p.get<int>("blur");
+    const int borderSize = p.get<int>("border-size");
+    const float borderHeight = p.get<float>("border-height");
     const bool quiet = p.exist("quiet");
 
     // helper function to display elapsed time of each step
@@ -68,8 +72,8 @@ int main(int argc, char **argv) {
     const auto hm = std::make_shared<Heightmap>(inFile);
     done();
 
-    const int w = hm->Width();
-    const int h = hm->Height();
+    int w = hm->Width();
+    int h = hm->Height();
     if (w * h == 0) {
         std::cerr
             << "invalid heightmap file (try png, jpg, etc.)" << std::endl
@@ -93,6 +97,15 @@ int main(int argc, char **argv) {
         hm->GaussianBlur(blurSigma);
         done();
     }
+
+    // add border
+    if (borderSize > 0) {
+        hm->AddBorder(borderSize, borderHeight);
+    }
+
+    // get updated size
+    w = hm->Width();
+    h = hm->Height();
 
     // triangulate
     done = timed("triangulating");

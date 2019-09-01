@@ -40,6 +40,22 @@ void Heightmap::Invert() {
     }
 }
 
+void Heightmap::AddBorder(const int size, const float z) {
+    const int w = m_Width + size * 2;
+    const int h = m_Height + size * 2;
+    std::vector<float> data(w * h, z);
+    int i = 0;
+    for (int y = 0; y < m_Height; y++) {
+        int j = (y + size) * w + size;
+        for (int x = 0; x < m_Width; x++) {
+            data[j++] = m_Data[i++];
+        }
+    }
+    m_Width = w;
+    m_Height = h;
+    m_Data = data;
+}
+
 void Heightmap::GaussianBlur(const int r) {
     m_Data = ::GaussianBlur(m_Data, m_Width, m_Height, r);
 }

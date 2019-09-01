@@ -32,6 +32,8 @@ public:
 
     void Invert();
 
+    void AddBorder(const int size, const float z);
+
     void GaussianBlur(const int r);
 
     std::pair<glm::ivec2, float> FindCandidate(
