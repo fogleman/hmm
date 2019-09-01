@@ -49,6 +49,7 @@ options:
       --blur             gaussian blur sigma (int [=0])
       --border-size      border size in pixels (int [=0])
       --border-height    border z height (float [=1])
+      --normal-map       path to write normal map png (string [=])
   -q, --quiet            suppress console output
   -?, --help             print this message
 ```
@@ -119,7 +120,6 @@ Performance depends a lot on the amount of detail in the heightmap, but here are
 
 ### TODO
 
-- export a normal map?
 - reconstruct grayscale image?
 - better error handling, especially for file I/O
 - better overflow handling - what's the largest supported heightmap?
