@@ -27,37 +27,37 @@ std::vector<int> BoxesForGaussian(const float sigma, const int n) {
 }
 
 void BoxBlurH(
-    std::vector<float> &scl,
-    std::vector<float> &tcl,
+    std::vector<float> &src,
+    std::vector<float> &dst,
     const int w, const int h, const int r)
 {
-    const float iarr = 1.f / (r + r + 1);
+    const float m = 1.f / (r + r + 1);
     for (int i = 0; i < h; i++) {
         int ti = i * w;
         int li = ti;
         int ri = ti + r;
-        float fv = scl[ti];
-        float lv = scl[ti + w - 1];
+        float fv = src[ti];
+        float lv = src[ti + w - 1];
         float val = (r + 1) * fv;
         for (int j = 0; j < r; j++) {
-            val += scl[ti + j];
+            val += src[ti + j];
         }
         for (int j = 0; j <= r; j++) {
-            val += scl[ri] - fv;
-            tcl[ti] = val * iarr;
+            val += src[ri] - fv;
+            dst[ti] = val * m;
             ri++;
             ti++;
         }
         for (int j = r + 1; j < w - r; j++) {
-            val += scl[ri] - scl[li];
-            tcl[ti] = val * iarr;
+            val += src[ri] - src[li];
+            dst[ti] = val * m;
             li++;
             ri++;
             ti++;
         }
         for (int j = w - r; j < w; j++) {
-            val += lv - scl[li];
-            tcl[ti] = val * iarr;
+            val += lv - src[li];
+            dst[ti] = val * m;
             li++;
             ti++;
         }
@@ -65,37 +65,37 @@ void BoxBlurH(
 }
 
 void BoxBlurV(
-    std::vector<float> &scl,
-    std::vector<float> &tcl,
+    std::vector<float> &src,
+    std::vector<float> &dst,
     const int w, const int h, const int r)
 {
-    const float iarr = 1.f / (r + r + 1);
+    const float m = 1.f / (r + r + 1);
     for (int i = 0; i < w; i++) {
         int ti = i;
         int li = ti;
         int ri = ti + r * w;
-        float fv = scl[ti];
-        float lv = scl[ti + w * (h - 1)];
+        float fv = src[ti];
+        float lv = src[ti + w * (h - 1)];
         float val = (r + 1) * fv;
         for (int j = 0; j < r; j++) {
-            val += scl[ti + j * w];
+            val += src[ti + j * w];
         }
         for (int j = 0; j <= r; j++) {
-            val += scl[ri] - fv;
-            tcl[ti] = val * iarr;
+            val += src[ri] - fv;
+            dst[ti] = val * m;
             ri += w;
             ti += w;
         }
         for (int j = r + 1; j < h - r; j++) {
-            val += scl[ri] - scl[li];
-            tcl[ti] = val * iarr;
+            val += src[ri] - src[li];
+            dst[ti] = val * m;
             li += w;
             ri += w;
             ti += w;
         }
         for (int j = h - r; j < h; j++) {
-            val += lv - scl[li];
-            tcl[ti] = val * iarr;
+            val += lv - src[li];
+            dst[ti] = val * m;
             li += w;
             ti += w;
         }
@@ -104,13 +104,13 @@ void BoxBlurV(
 
 
 void BoxBlur(
-    std::vector<float> &scl,
-    std::vector<float> &tcl,
+    std::vector<float> &src,
+    std::vector<float> &dst,
     const int w, const int h, const int r)
 {
-    tcl.assign(scl.begin(), scl.end());
-    BoxBlurH(tcl, scl, w, h, r);
-    BoxBlurV(scl, tcl, w, h, r);
+    dst.assign(src.begin(), src.end());
+    BoxBlurH(dst, src, w, h, r);
+    BoxBlurV(src, dst, w, h, r);
 }
 
 }
@@ -119,11 +119,11 @@ std::vector<float> GaussianBlur(
     const std::vector<float> &data,
     const int w, const int h, const int r)
 {
-    std::vector<float> scl = data;
-    std::vector<float> tcl(data.size());
+    std::vector<float> src = data;
+    std::vector<float> dst(data.size());
     const std::vector<int> boxes = BoxesForGaussian(r, 3);
-    BoxBlur(scl, tcl, w, h, (boxes[0] - 1) / 2);
-    BoxBlur(tcl, scl, w, h, (boxes[1] - 1) / 2);
-    BoxBlur(scl, tcl, w, h, (boxes[2] - 1) / 2);
-    return tcl;
+    BoxBlur(src, dst, w, h, (boxes[0] - 1) / 2);
+    BoxBlur(dst, src, w, h, (boxes[1] - 1) / 2);
+    BoxBlur(src, dst, w, h, (boxes[2] - 1) / 2);
+    return dst;
 }
