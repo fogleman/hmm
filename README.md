@@ -36,16 +36,21 @@ make install
 ### Usage
 
 ```
+heightmap meshing utility
 usage: hmm --zscale=float [options] ... infile outfile.stl
 options:
-  -z, --zscale       z scale relative to x & y (float)
-  -x, --zexagg       z exaggeration (float [=1])
-  -e, --error        maximum triangulation error (float [=0.001])
-  -t, --triangles    maximum number of triangles (int [=0])
-  -p, --points       maximum number of vertices (int [=0])
-  -b, --base         solid base height (float [=0])
-  -q, --quiet        suppress console output
-  -?, --help         print this message
+  -z, --zscale           z scale relative to x & y (float)
+  -x, --zexagg           z exaggeration (float [=1])
+  -e, --error            maximum triangulation error (float [=0.001])
+  -t, --triangles        maximum number of triangles (int [=0])
+  -p, --points           maximum number of vertices (int [=0])
+  -b, --base             solid base height (float [=0])
+      --invert           invert heightmap
+      --blur             gaussian blur sigma (int [=0])
+      --border-size      border size in pixels (int [=0])
+      --border-height    border z height (float [=1])
+  -q, --quiet            suppress console output
+  -?, --help             print this message
 ```
 
 `hmm` supports a variety of file formats like PNG, JPG, etc. for the input
@@ -80,6 +85,16 @@ The `-e` parameter defines the maximum allowed error in the output mesh, as a pe
 
 When the `-b` option is used to create a solid mesh, it defines the height of the base before the lowest part of the heightmesh appears, as a percentage of the heightmap's height. For example, if `-z 100 -b 0.5` were used, then the final mesh would be about 150 units tall (if a fully white pixel exists in the input).
 
+### Border
+
+A border can be added to the mesh with the `--border-size` and `--border-height` flags.
+
+### Filters
+
+A Gaussian blur can be applied with the `--blur` flag. This is particularly useful for noisy images.
+
+The heightmap can be inverted with the `--invert` flag.
+
 ### Performance
 
 Performance depends a lot on the amount of detail in the heightmap, but here are some figures for an example heightmap of a [40x40 kilometer area centered on Mount Everest](https://i.imgur.com/1i9djJ0.jpg). Various heightmap resolutions and permitted max errors are shown. Times computed on a 2018 13" MacBook Pro (2.7 GHz Intel Core i7).
@@ -104,12 +119,8 @@ Performance depends a lot on the amount of detail in the heightmap, but here are
 
 ### TODO
 
-- pre-triangulation filters? e.g. gaussian blur
 - export a normal map?
-- automatically compute some z scale?
+- reconstruct grayscale image?
 - better error handling, especially for file I/O
 - better overflow handling - what's the largest supported heightmap?
-- OpenCL rasterization?
 - mesh validation?
-- reconstruct grayscale image?
-- explicit lithophane support?
