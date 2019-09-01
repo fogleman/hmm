@@ -36,6 +36,10 @@ public:
 
     void GaussianBlur(const int r);
 
+    std::vector<glm::vec3> Normalmap(const float zScale) const;
+
+    void SaveNormalmap(const std::string &path, const float zScale) const;
+
     std::pair<glm::ivec2, float> FindCandidate(
         const glm::ivec2 p0,
         const glm::ivec2 p1,

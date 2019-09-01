@@ -1,6 +1,7 @@
 #include <chrono>
 #include <functional>
 #include <iostream>
+#include <string>
 
 #include "base.h"
 #include "cmdline.h"
@@ -26,6 +27,7 @@ int main(int argc, char **argv) {
     p.add<int>("blur", '\0', "gaussian blur sigma", false, 0);
     p.add<int>("border-size", '\0', "border size in pixels", false, 0);
     p.add<float>("border-height", '\0', "border z height", false, 1);
+    p.add<std::string>("normalmap", '\0', "path to write normalmap png", false, "");
     p.add("quiet", 'q', "suppress console output");
     p.footer("infile outfile.stl");
     p.parse_check(argc, argv);
@@ -48,6 +50,7 @@ int main(int argc, char **argv) {
     const int blurSigma = p.get<int>("blur");
     const int borderSize = p.get<int>("border-size");
     const float borderHeight = p.get<float>("border-height");
+    const std::string normalmapPath = p.get<std::string>("normalmap");
     const bool quiet = p.exist("quiet");
 
     // helper function to display elapsed time of each step
@@ -136,6 +139,13 @@ int main(int argc, char **argv) {
     done = timed("writing output");
     SaveBinarySTL(outFile, points, triangles);
     done();
+
+    // compute normalmap
+    if (!normalmapPath.empty()) {
+        done = timed("computing normalmap");
+        hm->SaveNormalmap(normalmapPath, zScale * zExaggeration);
+        done();
+    }
 
     // show total elapsed time
     if (!quiet) {

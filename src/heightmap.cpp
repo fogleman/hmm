@@ -1,9 +1,15 @@
 #include "heightmap.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/normal.hpp>
+
 #include "blur.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 Heightmap::Heightmap(const std::string &path) :
     m_Width(0),
@@ -58,6 +64,56 @@ void Heightmap::AddBorder(const int size, const float z) {
 
 void Heightmap::GaussianBlur(const int r) {
     m_Data = ::GaussianBlur(m_Data, m_Width, m_Height, r);
+}
+
+std::vector<glm::vec3> Heightmap::Normalmap(const float zScale) const {
+    const int w = m_Width - 1;
+    const int h = m_Height - 1;
+    std::vector<glm::vec3> result(w * h);
+    int i = 0;
+    for (int y0 = 0; y0 < h; y0++) {
+        const int y1 = y0 + 1;
+        const float yc = y0 + 0.5f;
+        for (int x0 = 0; x0 < w; x0++) {
+            const int x1 = x0 + 1;
+            const float xc = x0 + 0.5f;
+            const float z00 = At(x0, y0) * -zScale;
+            const float z01 = At(x0, y1) * -zScale;
+            const float z10 = At(x1, y0) * -zScale;
+            const float z11 = At(x1, y1) * -zScale;
+            const float zc = (z00 + z01 + z10 + z11) / 4.f;
+            const glm::vec3 p00(x0, y0, z00);
+            const glm::vec3 p01(x0, y1, z01);
+            const glm::vec3 p10(x1, y0, z10);
+            const glm::vec3 p11(x1, y1, z11);
+            const glm::vec3 pc(xc, yc, zc);
+            const glm::vec3 n0 = glm::triangleNormal(pc, p00, p10);
+            const glm::vec3 n1 = glm::triangleNormal(pc, p10, p11);
+            const glm::vec3 n2 = glm::triangleNormal(pc, p11, p01);
+            const glm::vec3 n3 = glm::triangleNormal(pc, p01, p00);
+            result[i] = glm::normalize(n0 + n1 + n2 + n3);
+            i++;
+        }
+    }
+    return result;
+}
+
+void Heightmap::SaveNormalmap(
+    const std::string &path,
+    const float zScale) const
+{
+    const std::vector<glm::vec3> nm = Normalmap(zScale);
+    std::vector<uint8_t> data(nm.size() * 3);
+    int i = 0;
+    for (glm::vec3 n : nm) {
+        n = (n + 1.f) / 2.f;
+        data[i++] = uint8_t(n.x * 255);
+        data[i++] = uint8_t(n.y * 255);
+        data[i++] = uint8_t(n.z * 255);
+    }
+    stbi_write_png(
+        path.c_str(), m_Width - 1, m_Height - 1, 3,
+        data.data(), (m_Width - 1) * 3);
 }
 
 std::pair<glm::ivec2, float> Heightmap::FindCandidate(
