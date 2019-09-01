@@ -66,12 +66,6 @@ int main(int argc, char **argv) {
     const auto hm = std::make_shared<Heightmap>(inFile);
     done();
 
-    if (blurSigma > 0) {
-        done = timed("blurring heightmap");
-        hm->GaussianBlur(blurSigma);
-        done();
-    }
-
     const int w = hm->Width();
     const int h = hm->Height();
     if (w * h == 0) {
@@ -84,6 +78,13 @@ int main(int argc, char **argv) {
     // display statistics
     if (!quiet) {
         printf("  %d x %d = %d pixels\n", w, h, w * h);
+    }
+
+    // blur heightmap
+    if (blurSigma > 0) {
+        done = timed("blurring heightmap");
+        hm->GaussianBlur(blurSigma);
+        done();
     }
 
     // triangulate
