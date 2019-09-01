@@ -1,5 +1,7 @@
 #include "heightmap.h"
 
+#include "blur.h"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -31,6 +33,10 @@ Heightmap::Heightmap(
     m_Height(height),
     m_Data(data)
 {}
+
+void Heightmap::GaussianBlur(const int r) {
+    m_Data = ::GaussianBlur(m_Data, m_Width, m_Height, r);
+}
 
 std::pair<glm::ivec2, float> Heightmap::FindCandidate(
     const glm::ivec2 p0,

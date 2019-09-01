@@ -30,6 +30,8 @@ public:
         return m_Data[p.y * m_Width + p.x];
     }
 
+    void GaussianBlur(const int r);
+
     std::pair<glm::ivec2, float> FindCandidate(
         const glm::ivec2 p0,
         const glm::ivec2 p1,
