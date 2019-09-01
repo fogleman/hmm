@@ -555,6 +555,7 @@ public:
 
   std::string usage() const {
     std::ostringstream oss;
+    oss<<"heightmap meshing utility"<<std::endl;
     oss<<"usage: "<<prog_name<<" ";
     for (size_t i=0; i<ordered.size(); i++){
       if (ordered[i]->must())
