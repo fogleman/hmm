@@ -34,6 +34,12 @@ Heightmap::Heightmap(
     m_Data(data)
 {}
 
+void Heightmap::Invert() {
+    for (int i = 0; i < m_Data.size(); i++) {
+        m_Data[i] = 1.f - m_Data[i];
+    }
+}
+
 void Heightmap::GaussianBlur(const int r) {
     m_Data = ::GaussianBlur(m_Data, m_Width, m_Height, r);
 }
