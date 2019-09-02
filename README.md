@@ -56,7 +56,7 @@ options:
 
 `hmm` supports a variety of file formats like PNG, JPG, etc. for the input
 heightmap. The output is always a binary STL file. The only other required
-parameter is ZSCALE, which specifies how much to scale the Z axis in the output
+parameter is `-z`, which specifies how much to scale the Z axis in the output
 mesh.
 
 ```bash
