@@ -70,6 +70,12 @@ vertices. (If multiple are specified, the first one reached is used.)
 $ hmm input.png output.stl -z 100 -e 0.001 -t 1000000
 ```
 
+### Visual Guide
+
+Click on the image below to see examples of various command line arguments.
+
+![Visual Guide](https://www.michaelfogleman.com/static/hmm/guide/all.png)
+
 ### Z Scale
 
 The required `-z` parameter defines the distance between a fully black pixel and a fully white pixel in the vertical Z axis, with units equal to one pixel width or height. For example, if each pixel in the heightmap represented a 1x1 meter square area, and the vertical range of the heightmap was 100 meters, then `-z 100` should be used.
