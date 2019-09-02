@@ -102,6 +102,10 @@ A Gaussian blur can be applied with the `--blur` flag. This is particularly usef
 
 The heightmap can be inverted with the `--invert` flag. This is useful for [lithophanes](https://en.wikipedia.org/wiki/Lithophane).
 
+### Normal Maps
+
+A full resolution [normal map](https://en.wikipedia.org/wiki/Normal_mapping) can be generated with the `--normal-map` argument. This will save a normal map as an RGB PNG to the specified path. This is useful for rendering higher resolution bumps and details while using a lower resolution triangle mesh.
+
 ### Performance
 
 Performance depends a lot on the amount of detail in the heightmap, but here are some figures for an example heightmap of a [40x40 kilometer area centered on Mount Everest](https://i.imgur.com/1i9djJ0.jpg). Various heightmap resolutions and permitted max errors are shown. Times computed on a 2018 13" MacBook Pro (2.7 GHz Intel Core i7).
