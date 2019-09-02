@@ -72,7 +72,7 @@ $ hmm input.png output.stl -z 100 -e 0.001 -t 1000000
 
 ### Visual Guide
 
-Click on the image below to see examples of various command line arguments.
+Click on the image below to see examples of various command line arguments. You can try these examples yourself with this heightmap: [gale.png](https://www.michaelfogleman.com/static/hmm/guide/gale.png).
 
 ![Visual Guide](https://www.michaelfogleman.com/static/hmm/guide/all.png)
 
