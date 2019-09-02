@@ -72,43 +72,73 @@ $ hmm input.png output.stl -z 100 -e 0.001 -t 1000000
 
 ### Visual Guide
 
-Click on the image below to see examples of various command line arguments. You can try these examples yourself with this heightmap: [gale.png](https://www.michaelfogleman.com/static/hmm/guide/gale.png).
+Click on the image below to see examples of various command line arguments. You
+can try these examples yourself with this heightmap: [gale.png](https://www.michaelfogleman.com/static/hmm/guide/gale.png).
 
 ![Visual Guide](https://www.michaelfogleman.com/static/hmm/guide/all.png)
 
 ### Z Scale
 
-The required `-z` parameter defines the distance between a fully black pixel and a fully white pixel in the vertical Z axis, with units equal to one pixel width or height. For example, if each pixel in the heightmap represented a 1x1 meter square area, and the vertical range of the heightmap was 100 meters, then `-z 100` should be used.
+The required `-z` parameter defines the distance between a fully black pixel
+and a fully white pixel in the vertical Z axis, with units equal to one pixel
+width or height. For example, if each pixel in the heightmap represented a 1x1
+meter square area, and the vertical range of the heightmap was 100 meters, then
+`-z 100` should be used.
 
 ### Z Exaggeration
 
-The `-x` parameter is simply an extra multiplier on top of the provided Z scale. It is provided as a convenience so you don't have to do multiplication in your head just to exaggerate by, e.g. 2x, since Z scales are often derived from real world data and can have strange values like 142.2378.
+The `-x` parameter is simply an extra multiplier on top of the provided Z
+scale. It is provided as a convenience so you don't have to do multiplication
+in your head just to exaggerate by, e.g. 2x, since Z scales are often derived
+from real world data and can have strange values like 142.2378.
 
 ### Max Error
 
-The `-e` parameter defines the maximum allowed error in the output mesh, as a percentage of the total mesh height. For example, if `-e 0.01` is used, then no pixel will have an error of more than 1% of the distance between a fully black pixel and a fully white pixel. This means that for an 8-bit input image, an error of `e = 1 / 256 ~= 0.0039` will ensure that no pixel has an error greater than one full grayscale unit. (It may still be desireable to use a lower value like `0.5 / 256`.)
+The `-e` parameter defines the maximum allowed error in the output mesh, as a
+percentage of the total mesh height. For example, if `-e 0.01` is used, then no
+pixel will have an error of more than 1% of the distance between a fully black
+pixel and a fully white pixel. This means that for an 8-bit input image, an
+error of `e = 1 / 256 ~= 0.0039` will ensure that no pixel has an error greater
+than one full grayscale unit. (It may still be desireable to use a lower value
+like `0.5 / 256`.)
 
 ### Base Height
 
-When the `-b` option is used to create a solid mesh, it defines the height of the base before the lowest part of the heightmesh appears, as a percentage of the heightmap's height. For example, if `-z 100 -b 0.5` were used, then the final mesh would be about 150 units tall (if a fully white pixel exists in the input).
+When the `-b` option is used to create a solid mesh, it defines the height of
+the base before the lowest part of the heightmesh appears, as a percentage of
+the heightmap's height. For example, if `-z 100 -b 0.5` were used, then the
+final mesh would be about 150 units tall (if a fully white pixel exists in the
+input).
 
 ### Border
 
-A border can be added to the mesh with the `--border-size` and `--border-height` flags. The heightmap will be padded by `border-size` pixels before triangulating. The (pre-scaled) Z value of the border can be set with `border-height` which defaults to 1.
+A border can be added to the mesh with the `--border-size` and
+`--border-height` flags. The heightmap will be padded by `border-size` pixels
+before triangulating. The (pre-scaled) Z value of the border can be set with
+`border-height` which defaults to 1.
 
 ### Filters
 
-A Gaussian blur can be applied with the `--blur` flag. This is particularly useful for noisy images.
+A Gaussian blur can be applied with the `--blur` flag. This is particularly
+useful for noisy images.
 
-The heightmap can be inverted with the `--invert` flag. This is useful for [lithophanes](https://en.wikipedia.org/wiki/Lithophane).
+The heightmap can be inverted with the `--invert` flag. This is useful for
+[lithophanes](https://en.wikipedia.org/wiki/Lithophane).
 
 ### Normal Maps
 
-A full resolution [normal map](https://en.wikipedia.org/wiki/Normal_mapping) can be generated with the `--normal-map` argument. This will save a normal map as an RGB PNG to the specified path. This is useful for rendering higher resolution bumps and details while using a lower resolution triangle mesh.
+A full resolution [normal map](https://en.wikipedia.org/wiki/Normal_mapping)
+can be generated with the `--normal-map` argument. This will save a normal map
+as an RGB PNG to the specified path. This is useful for rendering higher
+resolution bumps and details while using a lower resolution triangle mesh.
 
 ### Performance
 
-Performance depends a lot on the amount of detail in the heightmap, but here are some figures for an example heightmap of a [40x40 kilometer area centered on Mount Everest](https://i.imgur.com/1i9djJ0.jpg). Various heightmap resolutions and permitted max errors are shown. Times computed on a 2018 13" MacBook Pro (2.7 GHz Intel Core i7).
+Performance depends a lot on the amount of detail in the heightmap, but here
+are some figures for an example heightmap of a [40x40 kilometer area centered
+on Mount Everest](https://i.imgur.com/1i9djJ0.jpg). Various heightmap
+resolutions and permitted max errors are shown. Times computed on a 2018 13"
+MacBook Pro (2.7 GHz Intel Core i7).
 
 #### Runtime in Seconds
 
