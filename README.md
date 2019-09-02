@@ -94,13 +94,13 @@ When the `-b` option is used to create a solid mesh, it defines the height of th
 
 ### Border
 
-A border can be added to the mesh with the `--border-size` and `--border-height` flags.
+A border can be added to the mesh with the `--border-size` and `--border-height` flags. The heightmap will be padded by `border-size` pixels before triangulating. The (pre-scaled) Z value of the border can be set with `border-height` which defaults to 1.
 
 ### Filters
 
 A Gaussian blur can be applied with the `--blur` flag. This is particularly useful for noisy images.
 
-The heightmap can be inverted with the `--invert` flag.
+The heightmap can be inverted with the `--invert` flag. This is useful for [lithophanes](https://en.wikipedia.org/wiki/Lithophane).
 
 ### Performance
 
