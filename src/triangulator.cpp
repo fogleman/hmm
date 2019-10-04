@@ -21,8 +21,8 @@ void Triangulator::Run(
     const int p3 = AddPoint(glm::ivec2(x1, y1));
 
     // add initial two triangles
-    const int t0 = AddTriangle(p3, p0, p2, -1, -1, -1);
-    AddTriangle(p0, p3, p1, t0, -1, -1);
+    const int t0 = AddTriangle(p3, p0, p2, -1, -1, -1, -1);
+    AddTriangle(p0, p3, p1, t0, -1, -1, -1);
     Flush();
 
     // helper function to check if triangulation is complete
@@ -126,8 +126,8 @@ void Triangulator::Step() {
         const int b = m_Halfedges[a];
 
         if (b < 0) {
-            const int t0 = AddTriangle(pn, p0, pr, -1, har, -1);
-            const int t1 = AddTriangle(p0, pn, pl, t0, -1, hal);
+            const int t0 = AddTriangle(pn, p0, pr, -1, har, -1, a0);
+            const int t1 = AddTriangle(p0, pn, pl, t0, -1, hal, -1);
             Legalize(t0 + 1);
             Legalize(t1 + 2);
             return;
@@ -142,10 +142,10 @@ void Triangulator::Step() {
 
         QueueRemove(b / 3);
 
-        const int t0 = AddTriangle(p0, pr, pn, har, -1, -1);
-        const int t1 = AddTriangle(pr, p1, pn, hbr, -1, t0 + 1);
-        const int t2 = AddTriangle(p1, pl, pn, hbl, -1, t1 + 1);
-        const int t3 = AddTriangle(pl, p0, pn, hal, t0 + 2, t2 + 1);
+        const int t0 = AddTriangle(p0, pr, pn, har, -1, -1, a0);
+        const int t1 = AddTriangle(pr, p1, pn, hbr, -1, t0 + 1, b0);
+        const int t2 = AddTriangle(p1, pl, pn, hbl, -1, t1 + 1, -1);
+        const int t3 = AddTriangle(pl, p0, pn, hal, t0 + 2, t2 + 1, -1);
 
         Legalize(t0);
         Legalize(t1);
@@ -164,9 +164,9 @@ void Triangulator::Step() {
         const int h1 = m_Halfedges[e1];
         const int h2 = m_Halfedges[e2];
 
-        const int t0 = AddTriangle(p0, p1, pn, h0, -1, -1);
-        const int t1 = AddTriangle(p1, p2, pn, h1, -1, t0 + 1);
-        const int t2 = AddTriangle(p2, p0, pn, h2, t0 + 2, t1 + 1);
+        const int t0 = AddTriangle(p0, p1, pn, h0, -1, -1, e0);
+        const int t1 = AddTriangle(p1, p2, pn, h1, -1, t0 + 1, -1);
+        const int t2 = AddTriangle(p2, p0, pn, h2, t0 + 2, t1 + 1, -1);
 
         Legalize(t0);
         Legalize(t1);
@@ -184,20 +184,35 @@ int Triangulator::AddPoint(const glm::ivec2 point) {
 
 int Triangulator::AddTriangle(
     const int a, const int b, const int c,
-    const int ab, const int bc, const int ca)
+    const int ab, const int bc, const int ca,
+    int e)
 {
-    // new triangle index
-    const int t = m_Candidates.size();
-    // new halfedge index
-    const int e = m_Triangles.size();
-    // add triangle vertices
-    m_Triangles.push_back(a);
-    m_Triangles.push_back(b);
-    m_Triangles.push_back(c);
-    // add triangle halfedges
-    m_Halfedges.push_back(ab);
-    m_Halfedges.push_back(bc);
-    m_Halfedges.push_back(ca);
+    if (e < 0) {
+        // new halfedge index
+        e = m_Triangles.size();
+        // add triangle vertices
+        m_Triangles.push_back(a);
+        m_Triangles.push_back(b);
+        m_Triangles.push_back(c);
+        // add triangle halfedges
+        m_Halfedges.push_back(ab);
+        m_Halfedges.push_back(bc);
+        m_Halfedges.push_back(ca);
+        // add triangle metadata
+        m_Candidates.emplace_back(0);
+        m_Errors.push_back(0);
+        m_QueueIndexes.push_back(-1);
+    } else {
+        // set triangle vertices
+        m_Triangles[e + 0] = a;
+        m_Triangles[e + 1] = b;
+        m_Triangles[e + 2] = c;
+        // set triangle halfedges
+        m_Halfedges[e + 0] = ab;
+        m_Halfedges[e + 1] = bc;
+        m_Halfedges[e + 2] = ca;
+    }
+
     // link neighboring halfedges
     if (ab >= 0) {
         m_Halfedges[ab] = e + 0;
@@ -208,12 +223,11 @@ int Triangulator::AddTriangle(
     if (ca >= 0) {
         m_Halfedges[ca] = e + 2;
     }
-    // add triangle metadata
-    m_Candidates.emplace_back(0);
-    m_Errors.push_back(0);
-    m_QueueIndexes.push_back(-1);
+
     // add triangle to pending queue for later rasterization
+    const int t = e / 3;
     m_Pending.push_back(t);
+
     // return first halfedge index
     return e;
 }
@@ -279,8 +293,8 @@ void Triangulator::Legalize(const int a) {
     QueueRemove(a / 3);
     QueueRemove(b / 3);
 
-    const int t0 = AddTriangle(p0, p1, pl, -1, hbl, hal);
-    const int t1 = AddTriangle(p1, p0, pr, t0, har, hbr);
+    const int t0 = AddTriangle(p0, p1, pl, -1, hbl, hal, a0);
+    const int t1 = AddTriangle(p1, p0, pr, t0, har, hbr, b0);
 
     Legalize(t0 + 1);
     Legalize(t1 + 2);

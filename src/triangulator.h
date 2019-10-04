@@ -38,7 +38,8 @@ private:
 
     int AddTriangle(
         const int a, const int b, const int c,
-        const int ab, const int bc, const int ca);
+        const int ab, const int bc, const int ca,
+        int e);
 
     void Legalize(const int a);
 
