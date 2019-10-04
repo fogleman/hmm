@@ -30,7 +30,11 @@ public:
         return m_Data[p.y * m_Width + p.x];
     }
 
+    void AutoLevel();
+
     void Invert();
+
+    void GammaCurve(const float gamma);
 
     void AddBorder(const int size, const float z);
 

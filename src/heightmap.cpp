@@ -40,9 +40,30 @@ Heightmap::Heightmap(
     m_Data(data)
 {}
 
+void Heightmap::AutoLevel() {
+    float lo = m_Data[0];
+    float hi = m_Data[0];
+    for (int i = 0; i < m_Data.size(); i++) {
+        lo = std::min(lo, m_Data[i]);
+        hi = std::max(hi, m_Data[i]);
+    }
+    if (hi == lo) {
+        return;
+    }
+    for (int i = 0; i < m_Data.size(); i++) {
+        m_Data[i] = (m_Data[i] - lo) / (hi - lo);
+    }
+}
+
 void Heightmap::Invert() {
     for (int i = 0; i < m_Data.size(); i++) {
         m_Data[i] = 1.f - m_Data[i];
+    }
+}
+
+void Heightmap::GammaCurve(const float gamma) {
+    for (int i = 0; i < m_Data.size(); i++) {
+        m_Data[i] = std::pow(m_Data[i], gamma);
     }
 }
 
