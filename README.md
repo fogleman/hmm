@@ -45,8 +45,10 @@ options:
   -t, --triangles        maximum number of triangles (int [=0])
   -p, --points           maximum number of vertices (int [=0])
   -b, --base             solid base height (float [=0])
+      --level            auto level input to full grayscale range
       --invert           invert heightmap
       --blur             gaussian blur sigma (int [=0])
+      --gamma            gamma curve exponent (float [=0])
       --border-size      border size in pixels (int [=0])
       --border-height    border z height (float [=1])
       --normal-map       path to write normal map png (string [=])
