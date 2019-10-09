@@ -127,6 +127,12 @@ useful for noisy images.
 The heightmap can be inverted with the `--invert` flag. This is useful for
 [lithophanes](https://en.wikipedia.org/wiki/Lithophane).
 
+The heightmap can be auto-leveled with the `--level` flag. This will stretch
+the grayscale values to use the entire black => white range.
+
+A gamma curve can be applied to the heightmap with the `--gamma` flag. This
+applies `x = x ^ gamma` to each pixel, where `x` is in [0, 1].
+
 ### Normal Maps
 
 A full resolution [normal map](https://en.wikipedia.org/wiki/Normal_mapping)
