@@ -101,7 +101,7 @@ percentage of the total mesh height. For example, if `-e 0.01` is used, then no
 pixel will have an error of more than 1% of the distance between a fully black
 pixel and a fully white pixel. This means that for an 8-bit input image, an
 error of `e = 1 / 256 ~= 0.0039` will ensure that no pixel has an error greater
-than one full grayscale unit. (It may still be desireable to use a lower value
+than one full grayscale unit. (It may still be desirable to use a lower value
 like `0.5 / 256`.)
 
 ### Base Height
