@@ -30,6 +30,8 @@ int main(int argc, char **argv) {
     p.add<int>("border-size", '\0', "border size in pixels", false, 0);
     p.add<float>("border-height", '\0', "border z height", false, 1);
     p.add<std::string>("normal-map", '\0', "path to write normal map png", false, "");
+    p.add<float>("scale-x", '\0', "scale x axis", false, 1);
+    p.add<float>("scale-y", '\0', "scale y axis", false, 1);
     p.add("quiet", 'q', "suppress console output");
     p.footer("infile outfile.stl");
     p.parse_check(argc, argv);
@@ -55,6 +57,8 @@ int main(int argc, char **argv) {
     const int borderSize = p.get<int>("border-size");
     const float borderHeight = p.get<float>("border-height");
     const std::string normalmapPath = p.get<std::string>("normal-map");
+    const float scale_x = p.get<float>("scale-x");
+    const float scale_y = p.get<float>("scale-y");
     const bool quiet = p.exist("quiet");
 
     // helper function to display elapsed time of each step
@@ -66,10 +70,10 @@ int main(int argc, char **argv) {
         }
         printf("%s... ", message.c_str());
         fflush(stdout);
-        const auto startTime = std::chrono::steady_clock::now();
-        return [message, startTime]() {
+        const auto startTime1 = std::chrono::steady_clock::now();
+        return [message, startTime1]() {
             const std::chrono::duration<double> elapsed =
-                std::chrono::steady_clock::now() - startTime;
+                std::chrono::steady_clock::now() - startTime1;
             printf("%gs\n", elapsed.count());
         };
     };
@@ -151,7 +155,7 @@ int main(int argc, char **argv) {
 
     // write output file
     done = timed("writing output");
-    SaveBinarySTL(outFile, points, triangles);
+    SaveBinarySTL(outFile, points, triangles, scale_x, scale_y);
     done();
 
     // compute normal map
