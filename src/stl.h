@@ -7,4 +7,6 @@
 void SaveBinarySTL(
     const std::string &path,
     const std::vector<glm::vec3> &points,
-    const std::vector<glm::ivec3> &triangles);
+    const std::vector<glm::ivec3> &triangles,
+    const float &scale_x,
+    const float &scale_y);

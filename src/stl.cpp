@@ -9,7 +9,9 @@
 void SaveBinarySTL(
     const std::string &path,
     const std::vector<glm::vec3> &points,
-    const std::vector<glm::ivec3> &triangles)
+    const std::vector<glm::ivec3> &triangles,
+    const float &scale_x,
+    const float &scale_y)
 {
     // TODO: properly handle endian-ness
 
@@ -20,10 +22,20 @@ void SaveBinarySTL(
     memcpy(dst + 80, &count, 4);
 
     for (uint32_t i = 0; i < triangles.size(); i++) {
-        const glm::ivec3 t = triangles[i];
-        const glm::vec3 p0 = points[t.x];
-        const glm::vec3 p1 = points[t.y];
-        const glm::vec3 p2 = points[t.z];
+        const glm::ivec3 &t = triangles[i];
+
+        glm::vec3 p0 = points[t.x];
+        glm::vec3 p1 = points[t.y];
+        glm::vec3 p2 = points[t.z];
+
+        p0.x *= scale_x;
+        p1.x *= scale_x;
+        p2.x *= scale_x;
+
+        p0.y *= scale_y;
+        p1.y *= scale_y;
+        p2.y *= scale_y;
+
         const glm::vec3 normal = glm::triangleNormal(p0, p1, p2);
         const uint64_t idx = 84 + i * 50;
         memcpy(dst + idx, &normal, 12);
