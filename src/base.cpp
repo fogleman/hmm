@@ -21,7 +21,7 @@ void AddBase(
     std::unordered_map<glm::vec3, int> lookup;
 
     // find points along each edge
-    for (int i = 0; i < points.size(); i++) {
+    for (size_t i = 0; i < points.size(); i++) {
         const auto &p = points[i];
         bool edge = false;
         if (p.x == 0) {
@@ -49,9 +49,9 @@ void AddBase(
     std::vector<std::pair<int, float>> sy1s(y1s.begin(), y1s.end());
 
     const auto pointIndex = [&lookup, &points](
-        const float x, const float y, const float z)
+        const float x, const float y, const float _z)
     {
-        const glm::vec3 point(x, y, z);
+        const glm::vec3 point(x, y, _z);
         if (lookup.find(point) == lookup.end()) {
             lookup[point] = points.size();
             points.push_back(point);
@@ -63,7 +63,7 @@ void AddBase(
     const int center = pointIndex(w * 0.5f, h * 0.5f, z);
 
     // edge x = 0
-    for (int i = 1; i < sx0s.size(); i++) {
+    for (size_t i = 1; i < sx0s.size(); i++) {
         const int y0 = sx0s[i-1].first;
         const int y1 = sx0s[i].first;
         const float z0 = sx0s[i-1].second;
@@ -78,7 +78,7 @@ void AddBase(
     }
 
     // edge x = w1
-    for (int i = 1; i < sx1s.size(); i++) {
+    for (size_t i = 1; i < sx1s.size(); i++) {
         const int y0 = sx1s[i-1].first;
         const int y1 = sx1s[i].first;
         const float z0 = sx1s[i-1].second;
@@ -93,7 +93,7 @@ void AddBase(
     }
 
     // edge y = 0
-    for (int i = 1; i < sy0s.size(); i++) {
+    for (size_t i = 1; i < sy0s.size(); i++) {
         const int x0 = sy0s[i-1].first;
         const int x1 = sy0s[i].first;
         const float z0 = sy0s[i-1].second;
@@ -108,7 +108,7 @@ void AddBase(
     }
 
     // edge y = h1
-    for (int i = 1; i < sy1s.size(); i++) {
+    for (size_t i = 1; i < sy1s.size(); i++) {
         const int x0 = sy1s[i-1].first;
         const int x1 = sy1s[i].first;
         const float z0 = sy1s[i-1].second;

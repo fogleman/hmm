@@ -66,10 +66,10 @@ int main(int argc, char **argv) {
         }
         printf("%s... ", message.c_str());
         fflush(stdout);
-        const auto startTime = std::chrono::steady_clock::now();
-        return [message, startTime]() {
+        const auto startTime1 = std::chrono::steady_clock::now();
+        return [message, startTime1]() {
             const std::chrono::duration<double> elapsed =
-                std::chrono::steady_clock::now() - startTime;
+                std::chrono::steady_clock::now() - startTime1;
             printf("%gs\n", elapsed.count());
         };
     };

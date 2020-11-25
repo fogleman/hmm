@@ -108,44 +108,44 @@ void Triangulator::Step() {
     const int pn = AddPoint(p);
 
     const auto collinear = [](
-        const glm::ivec2 p0, const glm::ivec2 p1, const glm::ivec2 p2)
+        const glm::ivec2 _p0, const glm::ivec2 _p1, const glm::ivec2 _p2)
     {
-        return (p1.y-p0.y)*(p2.x-p1.x) == (p2.y-p1.y)*(p1.x-p0.x);
+        return (_p1.y-_p0.y)*(_p2.x-_p1.x) == (_p2.y-_p1.y)*(_p1.x-_p0.x);
     };
 
-    const auto handleCollinear = [this](const int pn, const int a) {
-        const int a0 = a - a % 3;
-        const int al = a0 + (a + 1) % 3;
-        const int ar = a0 + (a + 2) % 3;
-        const int p0 = m_Triangles[ar];
-        const int pr = m_Triangles[a];
+    const auto handleCollinear = [this](const int _pn, const int _a) {
+        const int a0 = _a - _a % 3;
+        const int al = a0 + (_a + 1) % 3;
+        const int ar = a0 + (_a + 2) % 3;
+        const int _p0 = m_Triangles[ar];
+        const int pr = m_Triangles[_a];
         const int pl = m_Triangles[al];
         const int hal = m_Halfedges[al];
         const int har = m_Halfedges[ar];
 
-        const int b = m_Halfedges[a];
+        const int _b = m_Halfedges[_a];
 
-        if (b < 0) {
-            const int t0 = AddTriangle(pn, p0, pr, -1, har, -1, a0);
-            const int t1 = AddTriangle(p0, pn, pl, t0, -1, hal, -1);
+        if (_b < 0) {
+            const int t0 = AddTriangle(_pn, _p0, pr, -1, har, -1, a0);
+            const int t1 = AddTriangle(_p0, _pn, pl, t0, -1, hal, -1);
             Legalize(t0 + 1);
             Legalize(t1 + 2);
             return;
         }
 
-        const int b0 = b - b % 3;
-        const int bl = b0 + (b + 2) % 3;
-        const int br = b0 + (b + 1) % 3;
-        const int p1 = m_Triangles[bl];
+        const int b0 = _b - _b % 3;
+        const int bl = b0 + (_b + 2) % 3;
+        const int br = b0 + (_b + 1) % 3;
+        const int _p1 = m_Triangles[bl];
         const int hbl = m_Halfedges[bl];
         const int hbr = m_Halfedges[br];
 
-        QueueRemove(b / 3);
+        QueueRemove(_b / 3);
 
-        const int t0 = AddTriangle(p0, pr, pn, har, -1, -1, a0);
-        const int t1 = AddTriangle(pr, p1, pn, hbr, -1, t0 + 1, b0);
-        const int t2 = AddTriangle(p1, pl, pn, hbl, -1, t1 + 1, -1);
-        const int t3 = AddTriangle(pl, p0, pn, hal, t0 + 2, t2 + 1, -1);
+        const int t0 = AddTriangle(_p0, pr, _pn, har, -1, -1, a0);
+        const int t1 = AddTriangle(pr, _p1, _pn, hbr, -1, t0 + 1, b0);
+        const int t2 = AddTriangle(_p1, pl, _pn, hbl, -1, t1 + 1, -1);
+        const int t3 = AddTriangle(pl, _p0, _pn, hal, t0 + 2, t2 + 1, -1);
 
         Legalize(t0);
         Legalize(t1);
@@ -249,11 +249,11 @@ void Triangulator::Legalize(const int a) {
     //           pr                    pr
 
     const auto inCircle = [](
-        const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c,
+        const glm::ivec2 _a, const glm::ivec2 b, const glm::ivec2 c,
         const glm::ivec2 p)
     {
-        const int64_t dx = a.x - p.x;
-        const int64_t dy = a.y - p.y;
+        const int64_t dx = _a.x - p.x;
+        const int64_t dy = _a.y - p.y;
         const int64_t ex = b.x - p.x;
         const int64_t ey = b.y - p.y;
         const int64_t fx = c.x - p.x;
