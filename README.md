@@ -52,6 +52,9 @@ options:
       --border-size      border size in pixels (int [=0])
       --border-height    border z height (float [=1])
       --normal-map       path to write normal map png (string [=])
+      --shade-path       path to write hillshade png (string [=])
+      --shade-alt        hillshade light altitude (float [=45])
+      --shade-az         hillshade light azimuth (float [=0])
   -q, --quiet            suppress console output
   -?, --help             print this message
 ```
@@ -139,6 +142,13 @@ A full resolution [normal map](https://en.wikipedia.org/wiki/Normal_mapping)
 can be generated with the `--normal-map` argument. This will save a normal map
 as an RGB PNG to the specified path. This is useful for rendering higher
 resolution bumps and details while using a lower resolution triangle mesh.
+
+### Hillshade Images
+
+A grayscale hillshade image can be generated with the `--shade-path` argument.
+The altitude and azimuth of the light source can be changed with the
+`--shade-alt` and `--shade-az` arguments, which default to 45 degrees in
+altitude and 0 degrees from north (up).
 
 ### Performance
 
