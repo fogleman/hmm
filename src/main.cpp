@@ -30,18 +30,21 @@ int main(int argc, char **argv) {
     p.add<int>("border-size", '\0', "border size in pixels", false, 0);
     p.add<float>("border-height", '\0', "border z height", false, 1);
     p.add<std::string>("normal-map", '\0', "path to write normal map png", false, "");
+    p.add<std::string>("shade-path", '\0', "path to write hillshade png", false, "");
+    p.add<float>("shade-alt", '\0', "hillshade light altitude", false, 45);
+    p.add<float>("shade-az", '\0', "hillshade light azimuth", false, 0);
     p.add("quiet", 'q', "suppress console output");
     p.footer("infile outfile.stl");
     p.parse_check(argc, argv);
 
-    if (p.rest().size() != 2) {
-        std::cerr << "infile and outfile required" << std::endl << p.usage();
+    // infile required
+    if (p.rest().size() < 1) {
+        std::cerr << "infile required" << std::endl << p.usage();
         std::exit(1);
     }
 
     // extract command line arguments
     const std::string inFile = p.rest()[0];
-    const std::string outFile = p.rest()[1];
     const float zScale = p.get<float>("zscale");
     const float zExaggeration = p.get<float>("zexagg");
     const float maxError = p.get<float>("error");
@@ -55,7 +58,17 @@ int main(int argc, char **argv) {
     const int borderSize = p.get<int>("border-size");
     const float borderHeight = p.get<float>("border-height");
     const std::string normalmapPath = p.get<std::string>("normal-map");
+    const std::string shadePath = p.get<std::string>("shade-path");
+    const float shadeAlt = p.get<float>("shade-alt");
+    const float shadeAz = p.get<float>("shade-az");
     const bool quiet = p.exist("quiet");
+
+    const bool hasOutFile = p.rest().size() > 1;
+    const bool hasOtherFile = !normalmapPath.empty() || !shadePath.empty();
+    if (!hasOutFile && !hasOtherFile) {
+        std::cerr << "outfile required" << std::endl << p.usage();
+        std::exit(1);
+    }
 
     // helper function to display elapsed time of each step
     const auto timed = [quiet](const std::string &message)
@@ -124,40 +137,50 @@ int main(int argc, char **argv) {
     w = hm->Width();
     h = hm->Height();
 
-    // triangulate
-    done = timed("triangulating");
-    Triangulator tri(hm);
-    tri.Run(maxError, maxTriangles, maxPoints);
-    auto points = tri.Points(zScale * zExaggeration);
-    auto triangles = tri.Triangles();
-    done();
+    if (hasOutFile) {
+        // triangulate
+        done = timed("triangulating");
+        Triangulator tri(hm);
+        tri.Run(maxError, maxTriangles, maxPoints);
+        auto points = tri.Points(zScale * zExaggeration);
+        auto triangles = tri.Triangles();
+        done();
 
-    // add base
-    if (baseHeight > 0) {
-        done = timed("adding solid base");
-        const float z = -baseHeight * zScale * zExaggeration;
-        AddBase(points, triangles, w, h, z);
+        // add base
+        if (baseHeight > 0) {
+            done = timed("adding solid base");
+            const float z = -baseHeight * zScale * zExaggeration;
+            AddBase(points, triangles, w, h, z);
+            done();
+        }
+
+        // display statistics
+        if (!quiet) {
+            const int naiveTriangleCount = (w - 1) * (h - 1) * 2;
+            printf("  error = %g\n", tri.Error());
+            printf("  points = %ld\n", points.size());
+            printf("  triangles = %ld\n", triangles.size());
+            printf("  vs. naive = %g%%\n", 100.f * triangles.size() / naiveTriangleCount);
+        }
+
+        // write output file
+        done = timed("writing output");
+        const std::string outFile = p.rest()[1];
+        SaveBinarySTL(outFile, points, triangles);
         done();
     }
-
-    // display statistics
-    if (!quiet) {
-        const int naiveTriangleCount = (w - 1) * (h - 1) * 2;
-        printf("  error = %g\n", tri.Error());
-        printf("  points = %ld\n", points.size());
-        printf("  triangles = %ld\n", triangles.size());
-        printf("  vs. naive = %g%%\n", 100.f * triangles.size() / naiveTriangleCount);
-    }
-
-    // write output file
-    done = timed("writing output");
-    SaveBinarySTL(outFile, points, triangles);
-    done();
 
     // compute normal map
     if (!normalmapPath.empty()) {
         done = timed("computing normal map");
         hm->SaveNormalmap(normalmapPath, zScale * zExaggeration);
+        done();
+    }
+
+    // compute hillshade image
+    if (!shadePath.empty()) {
+        done = timed("computing hillshade image");
+        hm->SaveHillshade(shadePath, zScale * zExaggeration, shadeAlt, shadeAz);
         done();
     }
 

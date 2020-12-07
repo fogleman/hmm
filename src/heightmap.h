@@ -1,5 +1,6 @@
 #pragma once
 
+#define GLM_FORCE_SWIZZLE
 #include <glm/glm.hpp>
 #include <string>
 #include <utility>
@@ -43,6 +44,10 @@ public:
     std::vector<glm::vec3> Normalmap(const float zScale) const;
 
     void SaveNormalmap(const std::string &path, const float zScale) const;
+
+    void SaveHillshade(
+        const std::string &path, const float zScale,
+        const float altitude, const float azimuth) const;
 
     std::pair<glm::ivec2, float> FindCandidate(
         const glm::ivec2 p0,

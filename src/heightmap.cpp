@@ -2,6 +2,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/normal.hpp>
+#include <glm/gtx/polar_coordinates.hpp>
 
 #include "blur.h"
 
@@ -131,6 +132,28 @@ void Heightmap::SaveNormalmap(
         data[i++] = uint8_t(n.x * 255);
         data[i++] = uint8_t(n.y * 255);
         data[i++] = uint8_t(n.z * 255);
+    }
+    stbi_write_png(
+        path.c_str(), m_Width - 1, m_Height - 1, 3,
+        data.data(), (m_Width - 1) * 3);
+}
+
+void Heightmap::SaveHillshade(
+    const std::string &path,
+    const float zScale,
+    const float altitude,
+    const float azimuth) const
+{
+    const glm::vec3 light = glm::euclidean(glm::vec2(
+        glm::radians(90.f - altitude), glm::radians(-azimuth))).xzy();
+    const std::vector<glm::vec3> nm = Normalmap(zScale);
+    std::vector<uint8_t> data(nm.size() * 3);
+    int i = 0;
+    for (glm::vec3 n : nm) {
+        const uint8_t d = glm::clamp(glm::dot(n, light), 0.f, 1.f) * 255;
+        data[i++] = d;
+        data[i++] = d;
+        data[i++] = d;
     }
     stbi_write_png(
         path.c_str(), m_Width - 1, m_Height - 1, 3,
