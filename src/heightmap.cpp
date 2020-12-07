@@ -145,7 +145,7 @@ void Heightmap::SaveHillshade(
     const float azimuth) const
 {
     const glm::vec3 light = glm::euclidean(glm::vec2(
-        glm::radians(90.f - altitude), glm::radians(-azimuth))).xzy();
+        glm::radians(altitude), glm::radians(-azimuth))).xzy();
     const std::vector<glm::vec3> nm = Normalmap(zScale);
     std::vector<uint8_t> data(nm.size() * 3);
     int i = 0;
