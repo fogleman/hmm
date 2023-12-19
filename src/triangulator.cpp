@@ -390,3 +390,38 @@ bool Triangulator::QueueDown(const int i0, const int n) {
     }
     return i > i0;
 }
+// Private Function to check if a point is inside a triangle using barycentric coordinates by M. Llobera
+bool PointInTriangle(const glm::ivec2 p, const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c) const {
+    auto sign = [](const glm::ivec2 p1, const glm::ivec2 p2, const glm::ivec2 p3) {
+        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+    };
+
+    bool d1 = sign(p, a, b) < 0.0f;
+    bool d2 = sign(p, b, c) < 0.0f;
+    bool d3 = sign(p, c, a) < 0.0f;
+
+    return ((d1 == d2) && (d2 == d3));
+}
+
+// Public  function to triangle contianing point pt by M.Llobera
+int locatePoint(const glm::ivec2 pt) const {
+    for (int i = 0; i < m_Queue.size(); ++i) {
+        const int t = m_Queue[i];
+        const int e0 = t * 3;
+        const int e1 = e0 + 1;
+        const int e2 = e0 + 2;
+
+        const int p0 = m_Triangles[e0];
+        const int p1 = m_Triangles[e1];
+        const int p2 = m_Triangles[e2];
+
+        const glm::ivec2 a = m_Points[p0];
+        const glm::ivec2 b = m_Points[p1];
+        const glm::ivec2 c = m_Points[p2];
+
+        if (PointInTriangle(pt, a, b, c)) {
+            return t;
+        }
+    }
+    return -1;  // Point is not inside any triangle
+}

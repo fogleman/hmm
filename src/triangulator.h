@@ -23,6 +23,8 @@ public:
         return m_Queue.size();
     }
 
+    int locatePoint(const glm::ivec2 pt);
+    
     float Error() const;
 
     std::vector<glm::vec3> Points(const float zScale) const;
@@ -66,4 +68,6 @@ private:
     std::vector<int> m_Queue;
 
     std::vector<int> m_Pending;
+
+    bool PointInTriangle(const glm::ivec2 p, const glm::ivec2 a, const glm::ivec2 b, const glm::ivec2 c);
 };
